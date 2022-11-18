@@ -83,13 +83,25 @@ class Process: Equatable{
             
         if let tempoInicio = tempoInicio{
     
-            self.tempoAtual = tempo
-            
-            let interval = (tempoAtual! - tempoInicio)
-            if (interval.seconds >= duracaoProcesso) {
-                estado = .finalizado(tempoMedio:
-                                        tempoAtual! - tempoCriacao, memoriaDesalocar: tamanhoProcesso)
+           
+            if let tempoAtual = tempoAtual{
+                
+                let interval = (tempoAtual - tempoInicio)
+                
+                print("intervalo -> \(interval.seconds)")
+                
+                if (interval.seconds  >= duracaoProcesso) {
+                    estado = .finalizado(tempoMedio:
+                                            tempoAtual - tempoCriacao, memoriaDesalocar: tamanhoProcesso)
+                }else{
+                    self.tempoAtual = tempo
+                }
+                
+            }else{
+                self.tempoAtual = tempo
             }
+           
+            
         }else{
             tempoInicio = tempo
         }
@@ -121,9 +133,10 @@ class ViewModel: ObservableObject{
         .zip(timer)
         .receive(on: DispatchQueue.global())
         .map({ [unowned self] (process, timer) in
+            
             var processM = process
             
-            print(self.memoriaTamanho,self.memoriaOcupada)
+            print("Memoria -> \(self.memoriaOcupada)/\(self.memoriaTamanho)")
 
             
             switch processM.estado{
@@ -131,18 +144,17 @@ class ViewModel: ObservableObject{
             case .emEspera:
                 
                 if(self.memoriaOcupada + process.tamanhoProcesso <= self.memoriaTamanho){
-                      self.memoriaOcupada += process.tamanhoProcesso
+                    
+                    self.memoriaOcupada += process.tamanhoProcesso
                     processM.estado = .rodando
                 }
-                
 
             case .rodando:
                 
                 processM.addTime(tempo: timer)
                 
             case .finalizado(tempoMedio: _, memoriaDesalocar: _):
-                print("Finalizou")
-               
+                break
             }
             return processM
         })
@@ -150,19 +162,17 @@ class ViewModel: ObservableObject{
             
            
                   
-            
             switch process.estado{
                 
             case .emEspera:
-                print("emEspera ->", process.idString)
-                print(process.tempoInicio)
-                print(process.tempoAtual)
-
+                
                 self.processEntered.send(process)
+               // print("emEspera ->", process.idString)
+                //print(process.tempoInicio)
+                //print(process.tempoAtual)
+
             case .rodando:
-                print("rodando ->", process.idString)
-                print(process.tempoInicio)
-                print(process.tempoAtual)
+   
                 self.processEntered.send(process)
          
                
@@ -174,10 +184,11 @@ class ViewModel: ObservableObject{
                 print("finalizado ->", process.idString, tempoMedio)
                 print(process.tempoInicio)
                 print(process.tempoAtual)
+                print("\n\n\n")
             }
             
             DispatchQueue.main.async {
-                if let index = processes.index(of: process){
+                if let index = self.processes.firstIndex(of: process){
                     self.processes[index] = process
 
                 }else{
@@ -194,7 +205,6 @@ class ViewModel: ObservableObject{
 struct ContentView: View {
     
     @ObservedObject var viewModel = ViewModel()
-    let process =  PassthroughSubject<Process,Never>()
  
 
     var body: some View {
