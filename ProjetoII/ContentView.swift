@@ -133,7 +133,7 @@ class ViewModel: ObservableObject{
         .zip(timer)
         .receive(on: DispatchQueue.global())
         .map({ [unowned self] (process, timer) in
-            
+            print(Date())
             var processM = process
             
             print("Memoria -> \(self.memoriaOcupada)/\(self.memoriaTamanho)")
