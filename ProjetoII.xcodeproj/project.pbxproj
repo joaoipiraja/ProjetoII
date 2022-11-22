@@ -7,6 +7,13 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		4E1BAFE2292D029700B1ACB5 /* Queue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E1BAFE1292D029700B1ACB5 /* Queue.swift */; };
+		4E1BAFE4292D02B000B1ACB5 /* Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E1BAFE3292D02B000B1ACB5 /* Utils.swift */; };
+		4E1BAFE6292D02D100B1ACB5 /* Process.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E1BAFE5292D02D100B1ACB5 /* Process.swift */; };
+		4E1BAFE8292D02EA00B1ACB5 /* Notify.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E1BAFE7292D02EA00B1ACB5 /* Notify.swift */; };
+		4E1BAFEA292D031500B1ACB5 /* MemoriaRAMModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E1BAFE9292D031500B1ACB5 /* MemoriaRAMModel.swift */; };
+		4E1BAFEC292D033200B1ACB5 /* MemoriaRAM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E1BAFEB292D033200B1ACB5 /* MemoriaRAM.swift */; };
+		4E1BAFEE292D035200B1ACB5 /* Controladora.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E1BAFED292D035200B1ACB5 /* Controladora.swift */; };
 		4E3A02A4292555790075D0E1 /* ProjetoIIApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E3A02A3292555790075D0E1 /* ProjetoIIApp.swift */; };
 		4E3A02A6292555790075D0E1 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E3A02A5292555790075D0E1 /* ContentView.swift */; };
 		4E3A02A82925557A0075D0E1 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4E3A02A72925557A0075D0E1 /* Assets.xcassets */; };
@@ -34,6 +41,13 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		4E1BAFE1292D029700B1ACB5 /* Queue.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Queue.swift; sourceTree = "<group>"; };
+		4E1BAFE3292D02B000B1ACB5 /* Utils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Utils.swift; sourceTree = "<group>"; };
+		4E1BAFE5292D02D100B1ACB5 /* Process.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Process.swift; sourceTree = "<group>"; };
+		4E1BAFE7292D02EA00B1ACB5 /* Notify.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Notify.swift; sourceTree = "<group>"; };
+		4E1BAFE9292D031500B1ACB5 /* MemoriaRAMModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MemoriaRAMModel.swift; sourceTree = "<group>"; };
+		4E1BAFEB292D033200B1ACB5 /* MemoriaRAM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MemoriaRAM.swift; sourceTree = "<group>"; };
+		4E1BAFED292D035200B1ACB5 /* Controladora.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Controladora.swift; sourceTree = "<group>"; };
 		4E3A02A0292555790075D0E1 /* ProjetoII.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ProjetoII.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		4E3A02A3292555790075D0E1 /* ProjetoIIApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProjetoIIApp.swift; sourceTree = "<group>"; };
 		4E3A02A5292555790075D0E1 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -96,6 +110,13 @@
 			children = (
 				4E3A02A3292555790075D0E1 /* ProjetoIIApp.swift */,
 				4E3A02A5292555790075D0E1 /* ContentView.swift */,
+				4E1BAFE1292D029700B1ACB5 /* Queue.swift */,
+				4E1BAFE3292D02B000B1ACB5 /* Utils.swift */,
+				4E1BAFE5292D02D100B1ACB5 /* Process.swift */,
+				4E1BAFE7292D02EA00B1ACB5 /* Notify.swift */,
+				4E1BAFED292D035200B1ACB5 /* Controladora.swift */,
+				4E1BAFE9292D031500B1ACB5 /* MemoriaRAMModel.swift */,
+				4E1BAFEB292D033200B1ACB5 /* MemoriaRAM.swift */,
 				4E3A02A72925557A0075D0E1 /* Assets.xcassets */,
 				4E3A02A92925557A0075D0E1 /* Preview Content */,
 			);
@@ -257,8 +278,15 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4E1BAFEA292D031500B1ACB5 /* MemoriaRAMModel.swift in Sources */,
 				4E3A02A6292555790075D0E1 /* ContentView.swift in Sources */,
+				4E1BAFE6292D02D100B1ACB5 /* Process.swift in Sources */,
+				4E1BAFE8292D02EA00B1ACB5 /* Notify.swift in Sources */,
+				4E1BAFE2292D029700B1ACB5 /* Queue.swift in Sources */,
+				4E1BAFEE292D035200B1ACB5 /* Controladora.swift in Sources */,
+				4E1BAFEC292D033200B1ACB5 /* MemoriaRAM.swift in Sources */,
 				4E3A02A4292555790075D0E1 /* ProjetoIIApp.swift in Sources */,
+				4E1BAFE4292D02B000B1ACB5 /* Utils.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

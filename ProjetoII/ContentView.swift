@@ -8,238 +8,77 @@
 import SwiftUI
 import Combine
 
-extension Date {
-    static func - (lhs: Date, rhs: Date) -> TimeInterval {
-        return lhs.timeIntervalSinceReferenceDate - rhs.timeIntervalSinceReferenceDate
-    }
-    
-    func toHourFormat() -> String {
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "HH:mm:ss"
-        let newDateString = dateFormatter.string(from: self)
-        
-        return newDateString
-    }
-}
-
-extension TimeInterval {
-    var seconds: Int {
-        return Int(self) % 60
-    }
-}
-
-
-
-class Process: Equatable{
-    
-    static func == (lhs: Process, rhs: Process) -> Bool {
-        return lhs.id == rhs.id
-    }
-    
-    
-    enum Estado{
-        
-       case emEspera
-       case rodando
-       case finalizado(tempoMedio: Double, memoriaDesalocar: Int)
-        
-        
-        func toString() -> String{
-            switch self{
-                
-            case .emEspera:
-                return "Em Espera"
-            case .rodando:
-                return "Rodando"
-            case .finalizado(tempoMedio: let tempoMedio, memoriaDesalocar: let memoriaDesalocar):
-                return "Finalizado(tempoMedio = \(tempoMedio); memoriaDesalocar = \(memoriaDesalocar)"
-            }
-        }
-   }
-        
-    let id = UUID()
-    var idString: String {
-        get{
-            return "\(id.uuidString.prefix(5))"
-        }
-    }
-    
-    let duracaoProcesso: Int
-    let tamanhoProcesso: Int
-    
-    var tempoCriacao = Date()
-    var tempoInicio: Date? = nil
-    var tempoAtual: Date? = nil
-    
-    var estado: Estado = .emEspera
-    
-    init(duracaoProcesso: Int, tamanhoProcesso: Int) {
-        self.duracaoProcesso = duracaoProcesso
-        self.tamanhoProcesso = tamanhoProcesso
-    }
-    
-    func addTime(tempo: Date){
-        
-            
-        if let tempoInicio = tempoInicio{
-    
-           
-            if let tempoAtual = tempoAtual{
-                
-                let interval = (tempoAtual - tempoInicio)
-                
-                print("intervalo -> \(interval.seconds)")
-                
-                if (interval.seconds  >= duracaoProcesso) {
-                    estado = .finalizado(tempoMedio:
-                                            tempoAtual - tempoCriacao, memoriaDesalocar: tamanhoProcesso)
-                }else{
-                    self.tempoAtual = tempo
-                }
-                
-            }else{
-                self.tempoAtual = tempo
-            }
-           
-            
-        }else{
-            tempoInicio = tempo
-        }
-            
-    }
-}
-
-
-class ViewModel: ObservableObject{
-    
-    let memoriaTamanho:Int = 10
-    var memoriaOcupada:Int = 0
-    
-    let calendar = Calendar.current
-
-    let processEntered = PassthroughSubject<Process,Never>()
-    private var process: AnyPublisher<Process, Never> //read only
-    var timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
-    var cancellables = Set<AnyCancellable>()
-    
-    @Published  var processes = [Process]()
-
-    
-    init(){
-                
-        process = processEntered.eraseToAnyPublisher()
-            
-        process
-        .zip(timer)
-        .receive(on: DispatchQueue.global())
-        .map({ [unowned self] (process, timer) in
-            print(Date())
-            var processM = process
-            
-            print("Memoria -> \(self.memoriaOcupada)/\(self.memoriaTamanho)")
-
-            
-            switch processM.estado{
-                
-            case .emEspera:
-                
-                if(self.memoriaOcupada + process.tamanhoProcesso <= self.memoriaTamanho){
-                    
-                    self.memoriaOcupada += process.tamanhoProcesso
-                    processM.estado = .rodando
-                }
-
-            case .rodando:
-                
-                processM.addTime(tempo: timer)
-                
-            case .finalizado(tempoMedio: _, memoriaDesalocar: _):
-                break
-            }
-            return processM
-        })
-        .sink(receiveValue: {  [unowned self] process in
-            
-           
-                  
-            switch process.estado{
-                
-            case .emEspera:
-                
-                self.processEntered.send(process)
-               // print("emEspera ->", process.idString)
-                //print(process.tempoInicio)
-                //print(process.tempoAtual)
-
-            case .rodando:
-   
-                self.processEntered.send(process)
-         
-               
-                //self.processEntered.send(completion: .finished)
-            case .finalizado(tempoMedio: let tempoMedio, memoriaDesalocar: let memoriaDesalocar):
-                
-                self.memoriaOcupada -= memoriaDesalocar
-                
-                print("finalizado ->", process.idString, tempoMedio)
-                print(process.tempoInicio)
-                print(process.tempoAtual)
-                print("\n\n\n")
-            }
-            
-            DispatchQueue.main.async {
-                if let index = self.processes.firstIndex(of: process){
-                    self.processes[index] = process
-
-                }else{
-                    self.processes.append(process)
-                }
-            }
-         
-           
-        })
-        .store(in: &cancellables)
-    }
-}
 
 struct ContentView: View {
-    
-    @ObservedObject var viewModel = ViewModel()
- 
+        
+    @ObservedObject var ram = MemoriaRAM()
+    @ObservedObject var c = Controladora()
+
+   
 
     var body: some View {
         
         VStack{
             
+            
+            Section {
+                List{
+                    
+                    ForEach(c.processes.filter{ !$0.isFinished }, id: \.id) { process in
+                        
+                        Text("\(process.description)")
+
+                    }
+                    
+                }
+            } header: {
+                Text("Espera")
+            }
+            
+            Section {
+                List{
+                    
+                    ForEach(ram.rams, id: \.processo.id) { ram in
+                        
+                        Text("\(ram.processo.description)")
+
+                    }
+                    
+                }
+            } header: {
+                Text("Memoria RAM - \(c.memoria)")
+            }
+            
+            Section {
+                List{
+                    
+                    ForEach(c.processes.filter{ $0.isFinished }, id: \.id) { process in
+                        
+                        Text("\(process.description)")
+
+                    }
+                    
+                }
+            } header: {
+                Text("Finalizados")
+            }
 
             
-            List{
-                
-                ForEach(viewModel.processes, id: \.id) { process in
-                    
-                    Section(content: {
-                        Text("\(process.estado.toString())")
-                        Text("Tempo de criacao = \(process.tempoCriacao.toHourFormat())")
-                        Text("Tempo de inicio = \(process.tempoInicio?.toHourFormat() ?? "-")")
-                        Text("Tempo de atual = \(process.tempoAtual?.toHourFormat() ?? "-")")
-                    }, header: {
-                        Text("Processo id(\(process.idString))")
-                    })
-                   
-//                    Text(process.tempoCriacao)
-//                    Text(process.tempoInicio)
-//                    Text(process.tempoAtual)
-
-                }
-                
-            }
+            
+            
             
             
             Button {
-                
-            viewModel.processEntered.send(.init(duracaoProcesso: 10, tamanhoProcesso: 10))
-            viewModel.processEntered.send(.init(duracaoProcesso: 20, tamanhoProcesso: 10))
-            viewModel.processEntered.send(.init(duracaoProcesso: 10, tamanhoProcesso: 10))
+                c.addProcess()
+                c.addProcess()
+                c.addProcess()
+                c.addProcess()
+                c.addProcess()
+                c.addProcess()
+                c.addProcess()
+                c.addProcess()
+                c.addProcess()
+             
                 
             } label: {
                 Text("Teste")
