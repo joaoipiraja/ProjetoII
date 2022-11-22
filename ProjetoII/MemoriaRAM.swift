@@ -54,8 +54,6 @@ class MemoriaRAM: ObservableObject{
             .zip(timer)
             .sink { [unowned self] (notification,timer) in
                 
-                imprimirProcesso()
-                
                 if let ram = notification.object as? MemoriaRAMModel{
                     
                     DispatchQueue.main.async {

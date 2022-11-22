@@ -14,7 +14,10 @@ struct ContentView: View {
     @ObservedObject var ram = MemoriaRAM()
     @ObservedObject var c = Controladora()
 
-   
+    func calculateTempoMedio() -> Double{
+        let soma = c.processes.filter{ $0.isFinished}.reduce(0.0) { $0 + ($1.tempoAtual! - $1.tempoCriacao)}
+        return soma/Double(c.processes.count)
+    }
 
     var body: some View {
         
@@ -60,7 +63,10 @@ struct ContentView: View {
                     
                 }
             } header: {
-                Text("Finalizados")
+                VStack{
+                    Text("Finalizados")
+                    Text("\(calculateTempoMedio())")
+                }
             }
 
             

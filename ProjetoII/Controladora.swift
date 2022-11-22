@@ -81,7 +81,6 @@ class Controladora: ObservableObject{
                 print("\(memoriaAlocada)/\(memoria)")
                 
                     if(self.memoriaAlocada + process.tamanhoProcesso <= self.memoria){
-                        print("memoria")
                         if let process = self.queue.dequeue(){
                             let ram = MemoriaRAMModel(processo: process)
                             NotificationCenter.default.post(name:Notification.Name("rodando"), object: ram)
