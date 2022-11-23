@@ -9,12 +9,8 @@ import Foundation
 
 
 
-class Process: Equatable{
-    
-    static func == (lhs: Process, rhs: Process) -> Bool {
-        return lhs.id == rhs.id
-    }
-    
+class Process{
+   
 
     let id = UUID()
     var idString: String {
@@ -32,7 +28,7 @@ class Process: Equatable{
     
     
     public var description: String { return
-        "Process(\(idString)): {duracaoProcesso = \(duracaoProcesso);\n tamanhoProcesso = \(tamanhoProcesso); tempoCriacao = \(tempoCriacao); tempoInicio = \(tempoInicio); tempoAtual = \(tempoAtual)}"
+        "Process(\(idString)): \n DuracaoProcesso = \(duracaoProcesso);\n tamanhoProcesso = \(tamanhoProcesso); tempoCriacao = \(tempoCriacao); tempoInicio = \(tempoInicio); tempoAtual = \(tempoAtual)} "
     }
     
     var isFinished: Bool{

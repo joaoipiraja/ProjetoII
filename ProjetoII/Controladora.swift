@@ -14,17 +14,36 @@ class Controladora: ObservableObject{
     //Recebe tanto quem espera, quanto finaliza
     
     var n1:Notify
+    
     var cancellables = Set<AnyCancellable>()
-    let name = Notification.Name("finalizou")
-    let nameEspera = Notification.Name("espera")
+    let callFinalizou = Notification.Name("finalizou")
+    let callEspera = Notification.Name("espera")
     
     var queue = Queue<Process>()
     @Published var processes = Array<Process>()
-    
-    
+
     
     let memoria = 40
     var memoriaAlocada = 0
+    
+    
+    func firstFit(completion: (Process) -> ()){
+        if let process = self.queue.dequeue(){
+            completion(process)
+        }
+    }
+    
+    func bestFit(completion: (Process) -> ()){
+        if let process = self.queue.dequeue(){
+            completion(process)
+        }
+    }
+    
+    func worstFit(completion: (Process) -> ()){
+        if let process = self.queue.dequeue(){
+            completion(process)
+        }
+    }
     
     
     
@@ -54,35 +73,31 @@ class Controladora: ObservableObject{
         
         NotificationCenter.default
             
-            .publisher(for: nameEspera)
+            .publisher(for: callEspera)
             .merge(with:  NotificationCenter.default
-                .publisher(for: name))
+            .publisher(for: callFinalizou))
         
             .sink { [unowned self] notification in
             if let process = notification.object as? Process{
                 
-                
-                //Aqui que decide qual algoritmo usar?
-                
-                //First Fit
-                
+                //processo chega
                 
                 if(process.isFinished){
+                    // foi finalizado
+                    
                     self.memoriaAlocada -= process.tamanhoProcesso
                     updateProcess(processo: process)
                     
                 }else{
-                   // DispatchQueue.main.async {
-                        self.queue.enqueue(process)
-                    //}
-                    
+                    // vai para fila de espera
+                    self.queue.enqueue(process)
                 }
-                
-                print("\(memoriaAlocada)/\(memoria)")
-                
+                    //Verifica se há espaço
                     if(self.memoriaAlocada + process.tamanhoProcesso <= self.memoria){
-                        if let process = self.queue.dequeue(){
-                            let ram = MemoriaRAMModel(processo: process)
+                        
+                        //executa o algoritmo
+                        self.firstFit { process in
+                            let ram = MemoriaRAMModel(tipo: .processo(processo: process))
                             NotificationCenter.default.post(name:Notification.Name("rodando"), object: ram)
                             self.memoriaAlocada += process.tamanhoProcesso
                         }

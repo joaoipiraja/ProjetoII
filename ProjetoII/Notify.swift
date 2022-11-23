@@ -9,6 +9,8 @@ import Foundation
 
 struct Notify{
     
+    //Cria uma notificação
+    
     let center = NotificationCenter.default
     var name: NSNotification.Name
     private var token: NSObjectProtocol?

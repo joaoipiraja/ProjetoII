@@ -9,6 +9,8 @@ import SwiftUI
 import Combine
 
 
+
+
 struct ContentView: View {
         
     @ObservedObject var ram = MemoriaRAM()
@@ -38,19 +40,19 @@ struct ContentView: View {
                 Text("Espera")
             }
             
-            Section {
-                List{
-                    
-                    ForEach(ram.rams, id: \.processo.id) { ram in
-                        
-                        Text("\(ram.processo.description)")
-
-                    }
-                    
-                }
-            } header: {
-                Text("Memoria RAM - \(c.memoria)")
-            }
+//            Section {
+//                List{
+//                    
+//                    ForEach(ram.rams, id: \.processo.id) { ram in
+//                        
+//                        Text("\(ram.processo.description)")
+//
+//                    }
+//                    
+//                }
+//            } header: {
+//                Text("Memoria RAM - \(c.memoria)")
+//            }
             
             Section {
                 List{
@@ -65,7 +67,7 @@ struct ContentView: View {
             } header: {
                 VStack{
                     Text("Finalizados")
-                    Text("\(calculateTempoMedio())")
+                    Text("Tempo Medio = \(calculateTempoMedio())")
                 }
             }
 
