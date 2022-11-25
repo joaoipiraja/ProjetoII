@@ -54,13 +54,12 @@ class Controladora: ObservableObject{
             }
         }
     }
-    func addProcess(){
-        let p1 = Process(duracaoProcesso: 10, tamanhoProcesso: 20)
+    func addProcess(process: Process){
         
         DispatchQueue.main.async {
-            self.processes.append(p1)
+            self.processes.append(process)
         }
-        NotificationCenter.default.post(name: n1.name, object: p1)
+        NotificationCenter.default.post(name: n1.name, object: process)
     }
     
     

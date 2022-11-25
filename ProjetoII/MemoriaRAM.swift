@@ -8,6 +8,7 @@
 import Foundation
 import Combine
 
+
 class MemoriaRAM: ObservableObject{
     
     var cancellable: Cancellable?
@@ -16,7 +17,6 @@ class MemoriaRAM: ObservableObject{
     let nameFinalizou = Notification.Name("finalizou")
 
     @Published var rams = Array<MemoriaRAMModel>()
-    
     
     func index(processo: Process) -> Int?{
         return try? self.rams.firstIndex(where: { ram in
@@ -56,60 +56,116 @@ class MemoriaRAM: ObservableObject{
 
     
     func removeProcess(processo: Process){
-        if let index = self.index(processo: processo){
-            self.rams[index].tipo = .buraco
-        }
+            if let index = self.index(processo: processo){
+                self.rams[index].tipo = .buraco
+                self.mergeBuracos()
+            }
     }
     
     
     func atualizarProcesso(processo: Process){
         
-        DispatchQueue.main.async {
             if let index = self.index(processo: processo){
                 self.rams[index].tipo = .processo(processo: processo)
             }
-        }
+    }
+    
+    func mergeBuracos(){
+        
+    
+       
+            self.rams =  self.rams.sorted { $0.posicaoFim! < $1.posicaoFim!}
+            let ram = MemoriaRAMModel(tipo: .buraco)
+            
+            if let index = try? self.rams.firstIndex(where: {$0.tipo == .buraco}){
+                
+                ram.posicaoInicio = self.rams[index].posicaoInicio
+                    
+                    for i in index+1..<self.rams.count{
+                        if(self.rams[i].tipo == .buraco){
+                                ram.posicaoFim = self.rams[i].posicaoFim!
+                        } else {
+                            if ram.posicaoFim != nil{
+                                    self.rams[index] = ram
+                                    self.rams.removeSubrange(index+1...i)
+                            }
+                            break
+                        }
+                    }
+                
+
+            }
+        
+           
+        
     }
     
     func addProcess(ram: MemoriaRAMModel){
-        if let index = try? self.rams.firstIndex(where: {$0.tipo == .buraco}){
+        
+        
             
-            switch ram.tipo{
+            if let index = try? self.rams.firstIndex(where: {$0.tipo == .buraco}){
                 
-                case .so:
-                    break
-                case .processo(processo: let processo):
+                
+                switch ram.tipo{
                     
-                    let space =  self.rams[index].posicaoFim! - self.rams[index].posicaoInicio!
+                    case .so:
+                        break
+                    case .processo(processo: let processo):
                 
-                    ram.posicaoInicio = self.rams[index].posicaoInicio
-                    ram.posicaoFim =  self.rams[index].posicaoInicio! + processo.tamanhoProcesso
-                
-                    if(index+1 > self.rams.count){
-                        
-                        let aux = self.rams[index]
-                        aux.posicaoInicio = ram.posicaoFim! + 1
-                        aux.posicaoFim = aux.posicaoInicio! + space - processo.tamanhoProcesso
-                        
-                        self.rams[index] = ram
-                        self.rams[index+1] = aux
+                    if(self.rams[index].posicaoFim! - self.rams[index].posicaoInicio! >= processo.tamanhoProcesso ){
+                        ram.posicaoInicio = self.rams[index].posicaoInicio
+                        ram.posicaoFim =  ram.posicaoInicio! + processo.tamanhoProcesso
+                    
+                        if(index+1 > self.rams.count){
+                            
+                            let aux = self.rams[index]
+                            aux.posicaoInicio = ram.posicaoFim! + 1
+                            aux.posicaoFim =  self.rams[index].posicaoFim
+                            
+                            if(aux.posicaoInicio == aux.posicaoFim){
+                                    self.rams[index] = ram
+                                
+                            }else{
+                                    self.rams[index] = ram
+                                    self.rams[index+1] = aux
+                                
+                            }
 
+
+                            
+                        }else{
+                            let aux = self.rams[index]
+                            aux.posicaoInicio = ram.posicaoFim! + 1
+                            aux.posicaoFim = self.rams[index].posicaoFim
+                            
+                            if(aux.posicaoInicio == aux.posicaoFim){
+                                    self.rams[index] = ram
+                                
+                            }else{
+                                    self.rams[index] = ram
+                                    self.rams.append(aux)
+                            }
+
+
+                        }
+                    }
                         
-                    }else{
-                        let aux = self.rams[index]
-                        aux.posicaoInicio = ram.posicaoFim! + 1
-                        aux.posicaoFim = aux.posicaoInicio! + space - processo.tamanhoProcesso
+                    
                         
-                        self.rams[index] = ram
-                        self.rams.append(aux)
+                    case .buraco:
+                        break
                     }
                 
-                    
-                case .buraco:
-                    break
-                }
-            
-        }
+            }
+        
+            DispatchQueue.main.async {
+                self.rams =  self.rams.sorted { $0.posicaoFim! < $1.posicaoFim!}
+            }
+                
+        
+
+       
     }
     
     func inicial(){
@@ -122,23 +178,18 @@ class MemoriaRAM: ObservableObject{
     }
     
     init(){
-        inicial()
+        DispatchQueue.main.async {
+            self.inicial()
+        }
+        
         self.cancellable = NotificationCenter.default
             .publisher(for: name)
             .zip(timer)
             .sink { [unowned self] (notification,timer) in
                 
                 if let ram = notification.object as? MemoriaRAMModel{
-                    
                     addProcess(ram: ram)
-                    imprimirProcesso()
 
-                    
-//                    DispatchQueue.main.async {
-//                        self.rams.append(ram)
-//                    }
-                    
-                   // alocaProcesso(ram: ram)
                     
                     switch ram.tipo{
                             
@@ -152,7 +203,8 @@ class MemoriaRAM: ObservableObject{
 
 
                 }else if let process = notification.object as? Process{
-                                    
+                
+
                     var processM = process
                     
                     if processM.addTime(tempo: timer){
@@ -162,8 +214,9 @@ class MemoriaRAM: ObservableObject{
                         NotificationCenter.default.post(name: self.name, object: processM)
                     }
                     
-                    atualizarProcesso(processo: processM)
-                    
+                    self.atualizarProcesso(processo: processM)
+                    self.mergeBuracos()
+
                 }
                 
         }

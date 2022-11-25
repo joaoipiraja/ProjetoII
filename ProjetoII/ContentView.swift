@@ -25,51 +25,71 @@ struct ContentView: View {
         
         VStack{
             
-            
-            Section {
-                List{
-                    
-                    ForEach(c.processes.filter{ !$0.isFinished }, id: \.id) { process in
-                        
-                        Text("\(process.description)")
-
-                    }
-                    
-                }
-            } header: {
-                Text("Espera")
-            }
-            
+//            
 //            Section {
 //                List{
 //                    
-//                    ForEach(ram.rams, id: \.processo.id) { ram in
+//                    ForEach(c.processes.filter{ !$0.isFinished }, id: \.id) { process in
 //                        
-//                        Text("\(ram.processo.description)")
+//                        Text("\(process.description)")
 //
 //                    }
 //                    
 //                }
 //            } header: {
-//                Text("Memoria RAM - \(c.memoria)")
+//                Text("Espera")
 //            }
             
             Section {
                 List{
                     
-                    ForEach(c.processes.filter{ $0.isFinished }, id: \.id) { process in
+                    ForEach(ram.rams, id: \.id) { ram in
                         
-                        Text("\(process.description)")
+                        switch ram.tipo{
+                            case .so:
+                            VStack{
+                                Text("\(ram.posicaoInicio ?? -1)")
+                                Text("\(ram.posicaoFim ?? -1)")
+                                Text("S.O")
+                            }
+                            case .processo(processo: let p):
+                                VStack{
+                                    Text("\(ram.posicaoInicio ?? -1)")
+                                    Text("\(ram.posicaoFim ?? -1)")
+                                    Text("\(p.description)")
+                                }
+                                
+                            case .buraco:
+                                VStack{
+                                    Text("\(ram.posicaoInicio ?? -1)")
+                                    Text("\(ram.posicaoFim ?? -1)")
+                                    Text("Buraco")
+                                }
 
+                        }
                     }
                     
                 }
             } header: {
-                VStack{
-                    Text("Finalizados")
-                    Text("Tempo Medio = \(calculateTempoMedio())")
-                }
+                Text("Memoria RAM - \(c.memoria)")
             }
+            
+//            Section {
+//                List{
+//                    
+//                    ForEach(c.processes.filter{ $0.isFinished }, id: \.id) { process in
+//                        
+//                        Text("\(process.description)")
+//
+//                    }
+//                    
+//                }
+//            } header: {
+//                VStack{
+//                    Text("Finalizados")
+//                    Text("Tempo Medio = \(calculateTempoMedio())")
+//                }
+//            }
 
             
             
@@ -77,21 +97,22 @@ struct ContentView: View {
             
             
             Button {
-                c.addProcess()
-                c.addProcess()
-                c.addProcess()
-                c.addProcess()
-                c.addProcess()
-                c.addProcess()
-                c.addProcess()
-                c.addProcess()
-                c.addProcess()
+                c.addProcess(process: .init(duracaoProcesso: 10, tamanhoProcesso: 5))
+                c.addProcess(process: .init(duracaoProcesso: 10, tamanhoProcesso: 2))
+                c.addProcess(process: .init(duracaoProcesso: 10, tamanhoProcesso: 3))
+                c.addProcess(process: .init(duracaoProcesso: 10, tamanhoProcesso: 5))
+                c.addProcess(process: .init(duracaoProcesso: 10, tamanhoProcesso: 2))
+                c.addProcess(process: .init(duracaoProcesso: 10, tamanhoProcesso: 10))
+                c.addProcess(process: .init(duracaoProcesso: 10, tamanhoProcesso: 5))
+                c.addProcess(process: .init(duracaoProcesso: 10, tamanhoProcesso: 2))
+                c.addProcess(process: .init(duracaoProcesso: 10, tamanhoProcesso: 3))
              
                 
             } label: {
                 Text("Teste")
             }
         }
+
        
 
     }
