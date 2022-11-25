@@ -18,6 +18,7 @@ class MemoriaRAM: ObservableObject{
 
     @Published var rams = Array<MemoriaRAMModel>()
     
+    
     func index(processo: Process) -> Int?{
         return try? self.rams.firstIndex(where: { ram in
             
@@ -76,21 +77,36 @@ class MemoriaRAM: ObservableObject{
        
             self.rams =  self.rams.sorted { $0.posicaoFim! < $1.posicaoFim!}
             let ram = MemoriaRAMModel(tipo: .buraco)
+        
+         
             
             if let index = try? self.rams.firstIndex(where: {$0.tipo == .buraco}){
                 
+                print(self.rams[index].posicaoInicio,self.rams[index].posicaoFim)
                 ram.posicaoInicio = self.rams[index].posicaoInicio
                     
                     for i in index+1..<self.rams.count{
+                        print("Prox ram ->",self.rams[i].posicaoInicio,self.rams[i].posicaoFim, self.rams[i].tipo)
+
                         if(self.rams[i].tipo == .buraco){
                                 ram.posicaoFim = self.rams[i].posicaoFim!
+                            
+                                if(i >= self.rams.count-1){
+                                    self.rams[index] = ram
+                                    self.rams.removeSubrange(index+1...i)
+                                    break
+                                }
+                            
                         } else {
+
                             if ram.posicaoFim != nil{
                                     self.rams[index] = ram
                                     self.rams.removeSubrange(index+1...i)
                             }
                             break
                         }
+                        
+                        
                     }
                 
 

@@ -42,7 +42,7 @@ struct ContentView: View {
             
             Section {
                 List{
-                    
+                 
                     ForEach(ram.rams, id: \.id) { ram in
                         
                         switch ram.tipo{
