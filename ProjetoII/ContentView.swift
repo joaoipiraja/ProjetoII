@@ -25,71 +25,49 @@ struct ContentView: View {
         
         VStack{
             
-//            
-//            Section {
-//                List{
-//                    
-//                    ForEach(c.processes.filter{ !$0.isFinished }, id: \.id) { process in
-//                        
-//                        Text("\(process.description)")
-//
-//                    }
-//                    
-//                }
-//            } header: {
-//                Text("Espera")
-//            }
+            
+            
+            HStack{
+                ForEach(ram.rams, id: \.id) { ram in
+                    Card(ram: ram)
+                }
+            }
+             
             
             Section {
                 List{
-                 
-                    ForEach(ram.rams, id: \.id) { ram in
+                    
+                    ForEach(c.processes.filter{ !$0.isFinished }, id: \.id) { process in
                         
-                        switch ram.tipo{
-                            case .so:
-                            VStack{
-                                Text("\(ram.posicaoInicio ?? -1)")
-                                Text("\(ram.posicaoFim ?? -1)")
-                                Text("S.O")
-                            }
-                            case .processo(processo: let p):
-                                VStack{
-                                    Text("\(ram.posicaoInicio ?? -1)")
-                                    Text("\(ram.posicaoFim ?? -1)")
-                                    Text("\(p.description)")
-                                }
-                                
-                            case .buraco:
-                                VStack{
-                                    Text("\(ram.posicaoInicio ?? -1)")
-                                    Text("\(ram.posicaoFim ?? -1)")
-                                    Text("Buraco")
-                                }
+                        Text("\(process.description)")
 
-                        }
                     }
                     
                 }
             } header: {
-                Text("Memoria RAM - \(c.memoria)")
+                Text("Espera")
             }
             
-//            Section {
-//                List{
-//                    
-//                    ForEach(c.processes.filter{ $0.isFinished }, id: \.id) { process in
-//                        
-//                        Text("\(process.description)")
-//
-//                    }
-//                    
-//                }
-//            } header: {
-//                VStack{
-//                    Text("Finalizados")
-//                    Text("Tempo Medio = \(calculateTempoMedio())")
-//                }
-//            }
+          
+
+ 
+
+            Section {
+                List{
+                    
+                    ForEach(c.processes.filter{ $0.isFinished }, id: \.id) { process in
+                        
+                        Text("\(process.description)")
+
+                    }
+                    
+                }
+            } header: {
+                VStack{
+                    Text("Finalizados")
+                    Text("Tempo Medio = \(calculateTempoMedio())")
+                }
+            }
 
             
             
@@ -111,7 +89,7 @@ struct ContentView: View {
             } label: {
                 Text("Teste")
             }
-        }
+        }.padding()
 
        
 

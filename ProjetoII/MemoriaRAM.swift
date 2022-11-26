@@ -82,11 +82,9 @@ class MemoriaRAM: ObservableObject{
             
             if let index = try? self.rams.firstIndex(where: {$0.tipo == .buraco}){
                 
-                print(self.rams[index].posicaoInicio,self.rams[index].posicaoFim)
                 ram.posicaoInicio = self.rams[index].posicaoInicio
                     
                     for i in index+1..<self.rams.count{
-                        print("Prox ram ->",self.rams[i].posicaoInicio,self.rams[i].posicaoFim, self.rams[i].tipo)
 
                         if(self.rams[i].tipo == .buraco){
                                 ram.posicaoFim = self.rams[i].posicaoFim!

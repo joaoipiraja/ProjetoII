@@ -15,33 +15,37 @@ import Foundation
 // Divide o p
 
 
-enum RamTipo: Equatable{
-    
-    static func == (lhs: RamTipo, rhs: RamTipo) -> Bool {
-        switch (lhs, rhs) {
-        case (.so, .so),(.processo(processo: _), .processo(processo: _)), (.buraco, .buraco): return true
-        default: return false
-        }
-    }
 
-    case so
-    case processo(processo: Process)
-    case buraco
-    
-    
-}
 
 
 class MemoriaRAMModel{
     
+    enum Tipo: Equatable{
+        
+        static func == (lhs: Tipo, rhs: Tipo) -> Bool {
+            switch (lhs, rhs) {
+            case (.so, .so),(.processo(processo: _), .processo(processo: _)), (.buraco, .buraco): return true
+            default: return false
+            }
+        }
+
+        case so
+        case processo(processo: Process)
+        case buraco
+        
+        
+    }
+    
     let id = UUID()
     var posicaoInicio:Int?
     var posicaoFim:Int?
-    var tipo: RamTipo
+    var tipo: Tipo
     
-    init(tipo: RamTipo, posicaoInicio: Int? = nil, posicaoFim: Int? = nil){
+    init(tipo: Tipo, posicaoInicio: Int? = nil, posicaoFim: Int? = nil){
         self.tipo = tipo
         self.posicaoInicio = posicaoInicio
         self.posicaoFim = posicaoFim
     }
+    static var MOCK = MemoriaRAMModel(tipo: .buraco, posicaoInicio: 0, posicaoFim: 1)
+    
 }
