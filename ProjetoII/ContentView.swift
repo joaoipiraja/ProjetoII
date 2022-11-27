@@ -18,29 +18,37 @@ struct ContentView: View {
     
 
     func calculateTempoMedio() -> Double{
-        let soma = c.processes.filter{ $0.isFinished}.reduce(0.0) { $0 + ($1.tempoAtual! - $1.tempoCriacao)}
-        return soma/Double(c.processes.count)
+        let soma = c.processes_finalizados.filter{ $0.isFinished}.reduce(0.0) { $0 + ($1.tempoAtual! - $1.tempoCriacao)}
+        return soma/Double(c.processes_finalizados.count)
     }
 
     var body: some View {
         
         VStack{
             
-            
+           
             
             HStack{
-                ForEach(ram.rams, id: \.id) { ram in
-                    Card(ram: ram)
+                ForEach(self.ram.rams, id: \.id) { r in
+                    Card(ram: r)
                 }
+                
             }
              
             
             Section {
                 List{
                     
-                    ForEach(c.queue.elements.filter{ !$0.isFinished }, id: \.id) { process in
-                        
-                        Text("\(process.description)")
+                    ForEach(ram.queue.elements, id: \.id) { r in
+                        switch r.tipo{
+                            case .so:
+                                Text("")
+                            case .processo(processo: let p):
+                              Text("\(p.description)")
+                            case .buraco:
+                                Text("")
+                                
+                        }
 
                     }
                     
@@ -52,7 +60,7 @@ struct ContentView: View {
             Section {
                 List{
 
-                    ForEach(c.processes.filter{ $0.isFinished }, id: \.id) { process in
+                    ForEach(c.processes_finalizados.filter{ $0.isFinished }, id: \.id) { process in
 
                         Text("\(process.description)")
 
@@ -86,7 +94,9 @@ struct ContentView: View {
             } label: {
                 Text("Teste")
             }
-        }.padding()
+        }
+        .padding()
+
 
        
 

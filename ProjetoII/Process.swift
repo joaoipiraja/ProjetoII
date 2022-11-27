@@ -9,7 +9,7 @@ import Foundation
 
 
 
-class Process{
+class Process: ObservableObject{
    
 
     let id = UUID()
@@ -22,10 +22,10 @@ class Process{
     let duracaoProcesso: Int
     let tamanhoProcesso: Int
     
-    var tempoCriacao = Date()
-    var tempoInicio: Date? = nil
+    @Published var tempoCriacao = Date()
+    @Published var tempoInicio: Date? = nil
     private var tempoFinal: Date? = nil
-    var tempoAtual: Date? = nil
+    @Published var tempoAtual: Date? = nil
     
     
     
@@ -33,7 +33,7 @@ class Process{
         "Process(\(idString)): \n DuracaoProcesso = \(duracaoProcesso);\n tamanhoProcesso = \(tamanhoProcesso); tempoCriacao = \(tempoCriacao); tempoInicio = \(tempoInicio); tempoAtual = \(tempoAtual)} "
     }
     
-    var isFinished: Bool = false
+    @Published var isFinished: Bool = false
     
     init(duracaoProcesso: Int, tamanhoProcesso: Int) {
         self.duracaoProcesso = duracaoProcesso

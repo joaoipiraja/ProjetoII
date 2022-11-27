@@ -18,7 +18,7 @@ import Foundation
 
 
 
-class MemoriaRAMModel{
+class MemoriaRAMModel: ObservableObject{
     
     enum Tipo: Equatable{
         
@@ -37,9 +37,9 @@ class MemoriaRAMModel{
     }
     
     let id = UUID()
-    var posicaoInicio:Int?
-    var posicaoFim:Int?
-    var tipo: Tipo
+    @Published var posicaoInicio:Int?
+    @Published var posicaoFim:Int?
+    @Published var tipo: Tipo
     
     init(tipo: Tipo, posicaoInicio: Int? = nil, posicaoFim: Int? = nil){
         self.tipo = tipo

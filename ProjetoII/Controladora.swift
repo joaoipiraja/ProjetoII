@@ -17,24 +17,10 @@ class Controladora: ObservableObject{
     
     var cancellables = Set<AnyCancellable>()
     
-    var queue = Queue<Process>()
-    @Published var processes = Array<Process>()
+    @Published var processes_finalizados = Array<Process>()
 
-    
-    let memoria = 40
-    var memoriaAlocada = 0
-    
-
-    
-    func updateProcess(processo: Process){
-            if let index = try? self.processes.firstIndex(where: {$0.id == processo.id}) {
-                self.processes[index] = processo
-            }
-        
-    }
+ 
     func addProcess(process: Process){
-        
-        self.processes.append(process)
         
         NotificationCenter.default.post(name: n1.name, object: process)
     }
@@ -57,26 +43,13 @@ class Controladora: ObservableObject{
                 
                 if(process.isFinished){
                     // foi finalizado
-                    
-                    self.memoriaAlocada -= process.tamanhoProcesso
-                    updateProcess(processo: process)
+                    processes_finalizados.append(process)
                     
                 }else{
-                    // vai para fila de espera
-                    self.queue.enqueue(process)
+                    let ram = MemoriaRAMModel(tipo: .processo(processo: process))
+                    NotificationCenter.default.post(name:Notification.Name("rodando"), object: ram)
+
                 }
-                    //Verifica se há espaço
-                    if(self.memoriaAlocada + process.tamanhoProcesso <= self.memoria){
-                        
-                        //executa o algoritmo
-                        if let process = self.queue.dequeue(){
-                            let ram = MemoriaRAMModel(tipo: .processo(processo: process))
-                            NotificationCenter.default.post(name:Notification.Name("rodando"), object: ram)
-                            self.memoriaAlocada += process.tamanhoProcesso
-                        }
-                       
-                    }
-                
                
 
             }

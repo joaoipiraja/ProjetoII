@@ -9,12 +9,19 @@ import Foundation
 import Combine
 
 
+enum EstrategiaAlocacao{
+    case bestFit
+    case firstFit
+    case worstFit
+}
+
 class MemoriaRAM: ObservableObject{
     
     var cancellable: Cancellable?
     var timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
-
-   @Published var rams = Array<MemoriaRAMModel>()
+    
+    @Published var queue = Queue<MemoriaRAMModel>()
+    @Published var rams = Array<MemoriaRAMModel>()
     
     
     func index(processo: Process) -> Int?{
@@ -31,6 +38,41 @@ class MemoriaRAM: ObservableObject{
             return false
         })
     }
+    
+    
+    func findRole(alg: EstrategiaAlocacao) -> Int?{
+        
+        var distance = self.rams.enumerated()
+
+            .map { (index,ram) in
+            switch ram.tipo{
+                    
+                case .so:
+                    return (index,0)
+                case .processo(processo: _):
+                    return (index,0)
+                case .buraco:
+                    return (index,ram.posicaoFim! - ram.posicaoInicio!)
+            }
+            }.filter {$0.1 > 0}
+        
+        
+        let max = distance.sorted(by: {$0.1 > $1.1}).first
+        let min = distance.sorted(by: {$0.1 < $1.1}).first
+        
+        
+
+        
+        switch alg{
+            case .bestFit:
+                return max?.0
+            case .firstFit:
+                return try? self.rams.firstIndex(where: {$0.tipo == .buraco})
+            case .worstFit:
+                return min?.0
+        }
+    }
+
 
     
     func removeProcess(processo: Process){
@@ -87,9 +129,10 @@ class MemoriaRAM: ObservableObject{
     
     func addProcess(ram: MemoriaRAMModel){
         
+            self.rams =  self.rams.sorted { $0.posicaoFim! < $1.posicaoFim!}
         
             
-            if let index = try? self.rams.firstIndex(where: {$0.tipo == .buraco}){
+        if let index = findRole(alg: .worstFit){
                 
                 
                 switch ram.tipo{
@@ -116,8 +159,7 @@ class MemoriaRAM: ObservableObject{
                                     self.rams[index+1] = aux
                                 
                             }
-
-
+                            
                             
                         }else{
                             let aux = self.rams[index]
@@ -130,10 +172,14 @@ class MemoriaRAM: ObservableObject{
                             }else{
                                     self.rams[index] = ram
                                     self.rams.append(aux)
+                                    
                             }
 
-
                         }
+                    }else{
+                        
+                        queue.enqueue(ram)
+
                     }
                         
                     
@@ -144,7 +190,6 @@ class MemoriaRAM: ObservableObject{
                 
             }
         
-        self.rams =  self.rams.sorted { $0.posicaoFim! < $1.posicaoFim!}
             
                 
         
@@ -158,12 +203,11 @@ class MemoriaRAM: ObservableObject{
         
         rams.append(so)
         rams.append(buraco)
-
     }
     
     init(){
         self.inicial()
-        
+
         
         self.cancellable =
             Notify.Tipo.Rodando.It
@@ -171,8 +215,9 @@ class MemoriaRAM: ObservableObject{
             .sink { [unowned self] (notification,timer) in
                 
                 if let ram = notification.object as? MemoriaRAMModel{
+                    
+                    
                     addProcess(ram: ram)
-
                     
                     switch ram.tipo{
                             
@@ -191,9 +236,19 @@ class MemoriaRAM: ObservableObject{
                     var processM = process
                     
                     if processM.addTime(tempo: timer){
+                        
+                        
                         self.removeProcess(processo: process)
                         processM.isFinished = true
+                        
+    
                         NotificationCenter.default.post(name: Notify.Tipo.Finalizou.Name, object: processM)
+                        
+                        
+                        if let model = self.queue.dequeue(){
+                            addProcess(ram: model)
+                        }
+
                     }else{
                         NotificationCenter.default.post(name: Notify.Tipo.Rodando.Name, object: processM)
                     }

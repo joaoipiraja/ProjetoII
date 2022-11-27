@@ -12,7 +12,7 @@ import SwiftUI
 
 struct Card: View{
 
-    var ram: MemoriaRAMModel
+    @ObservedObject var ram: MemoriaRAMModel
 
     var body: some View{
        
