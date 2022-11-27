@@ -24,16 +24,16 @@ class Process{
     
     var tempoCriacao = Date()
     var tempoInicio: Date? = nil
+    private var tempoFinal: Date? = nil
     var tempoAtual: Date? = nil
+    
     
     
     public var description: String { return
         "Process(\(idString)): \n DuracaoProcesso = \(duracaoProcesso);\n tamanhoProcesso = \(tamanhoProcesso); tempoCriacao = \(tempoCriacao); tempoInicio = \(tempoInicio); tempoAtual = \(tempoAtual)} "
     }
     
-    var isFinished: Bool{
-        return tempoInicio != nil && tempoAtual != nil
-    }
+    var isFinished: Bool = false
     
     init(duracaoProcesso: Int, tamanhoProcesso: Int) {
         self.duracaoProcesso = duracaoProcesso
@@ -46,16 +46,17 @@ class Process{
         if let tempoInicio = tempoInicio{
     
             self.tempoAtual = tempo
-            
-            let interval = (self.tempoAtual! - tempoInicio)
+
                         
-            if (interval.seconds  >= duracaoProcesso - 1 ) {
+            if (tempoAtual! >= tempoFinal!) {
+                tempoAtual = tempoFinal
                 return true
             }
 
         
         }else{
             tempoInicio = tempo
+            tempoFinal = tempo.adding(seconds: duracaoProcesso)
         }
         
         return false

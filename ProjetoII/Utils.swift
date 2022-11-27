@@ -13,6 +13,11 @@ extension Date {
         
         return newDateString
     }
+    
+        func adding(seconds: Int) -> Date {
+            return Calendar.current.date(byAdding: .second, value: seconds, to: self)!
+        }
+    
 }
 
 extension TimeInterval {

@@ -7,7 +7,29 @@
 
 import Foundation
 
+struct Publisher{
+    
+    var Name: Notification.Name
+    var It: NotificationCenter.Publisher{
+        get{
+            return NotificationCenter.default.publisher(for: Name)
+        }
+    }
+    
+    
+    
+}
+
 struct Notify{
+    
+    
+    struct Tipo{
+        
+        static var Rodando = Publisher(Name: Notification.Name("rodando"))
+        static var Finalizou = Publisher(Name: Notification.Name("finalizou"))
+        static var Espera = Publisher(Name: Notification.Name("espera"))
+        
+    }
     
     //Cria uma notificação
     

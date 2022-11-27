@@ -15,6 +15,7 @@ struct ContentView: View {
         
     @ObservedObject var ram = MemoriaRAM()
     @ObservedObject var c = Controladora()
+    
 
     func calculateTempoMedio() -> Double{
         let soma = c.processes.filter{ $0.isFinished}.reduce(0.0) { $0 + ($1.tempoAtual! - $1.tempoCriacao)}
@@ -37,7 +38,7 @@ struct ContentView: View {
             Section {
                 List{
                     
-                    ForEach(c.processes.filter{ !$0.isFinished }, id: \.id) { process in
+                    ForEach(c.queue.elements.filter{ !$0.isFinished }, id: \.id) { process in
                         
                         Text("\(process.description)")
 
@@ -48,19 +49,15 @@ struct ContentView: View {
                 Text("Espera")
             }
             
-          
-
- 
-
             Section {
                 List{
-                    
+
                     ForEach(c.processes.filter{ $0.isFinished }, id: \.id) { process in
-                        
+
                         Text("\(process.description)")
 
                     }
-                    
+
                 }
             } header: {
                 VStack{
@@ -75,14 +72,14 @@ struct ContentView: View {
             
             
             Button {
-                c.addProcess(process: .init(duracaoProcesso: 10, tamanhoProcesso: 5))
-                c.addProcess(process: .init(duracaoProcesso: 10, tamanhoProcesso: 2))
-                c.addProcess(process: .init(duracaoProcesso: 10, tamanhoProcesso: 3))
+                c.addProcess(process: .init(duracaoProcesso: 10, tamanhoProcesso: 10))
+                c.addProcess(process: .init(duracaoProcesso: 10, tamanhoProcesso: 10))
+                c.addProcess(process: .init(duracaoProcesso: 10, tamanhoProcesso: 10))
                 c.addProcess(process: .init(duracaoProcesso: 10, tamanhoProcesso: 5))
                 c.addProcess(process: .init(duracaoProcesso: 10, tamanhoProcesso: 2))
                 c.addProcess(process: .init(duracaoProcesso: 10, tamanhoProcesso: 10))
                 c.addProcess(process: .init(duracaoProcesso: 10, tamanhoProcesso: 5))
-                c.addProcess(process: .init(duracaoProcesso: 10, tamanhoProcesso: 2))
+                c.addProcess(process: .init(duracaoProcesso: 10, tamanhoProcesso: 10))
                 c.addProcess(process: .init(duracaoProcesso: 10, tamanhoProcesso: 3))
              
                 

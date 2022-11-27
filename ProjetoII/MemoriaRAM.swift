@@ -13,10 +13,8 @@ class MemoriaRAM: ObservableObject{
     
     var cancellable: Cancellable?
     var timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
-    let name = Notification.Name("rodando")
-    let nameFinalizou = Notification.Name("finalizou")
 
-    @Published var rams = Array<MemoriaRAMModel>()
+   @Published var rams = Array<MemoriaRAMModel>()
     
     
     func index(processo: Process) -> Int?{
@@ -33,43 +31,16 @@ class MemoriaRAM: ObservableObject{
             return false
         })
     }
-    
-    func imprimirProcesso(){
-    
-        
-        print("\n\nMemoria {")
-        for r in rams{
-            print("Posicao Inicio -> ",r.posicaoInicio)
-            print("Posicao Fim -> ",r.posicaoFim)
-            switch r.tipo{
-                
-            case .so:
-                print("SO")
-            case .processo(processo: let processo):
-                print(processo.description)
-            case .buraco:
-                print("Buraco")
-            }
-            print("\n")
-        }
-        print("}\n\n")
-    }
 
     
     func removeProcess(processo: Process){
             if let index = self.index(processo: processo){
                 self.rams[index].tipo = .buraco
-                self.mergeBuracos()
             }
+            self.mergeBuracos()
+
     }
     
-    
-    func atualizarProcesso(processo: Process){
-        
-            if let index = self.index(processo: processo){
-                self.rams[index].tipo = .processo(processo: processo)
-            }
-    }
     
     func mergeBuracos(){
         
@@ -173,9 +144,8 @@ class MemoriaRAM: ObservableObject{
                 
             }
         
-            DispatchQueue.main.async {
-                self.rams =  self.rams.sorted { $0.posicaoFim! < $1.posicaoFim!}
-            }
+        self.rams =  self.rams.sorted { $0.posicaoFim! < $1.posicaoFim!}
+            
                 
         
 
@@ -192,12 +162,11 @@ class MemoriaRAM: ObservableObject{
     }
     
     init(){
-        DispatchQueue.main.async {
-            self.inicial()
-        }
+        self.inicial()
         
-        self.cancellable = NotificationCenter.default
-            .publisher(for: name)
+        
+        self.cancellable =
+            Notify.Tipo.Rodando.It
             .zip(timer)
             .sink { [unowned self] (notification,timer) in
                 
@@ -210,7 +179,7 @@ class MemoriaRAM: ObservableObject{
                         case .so:
                             break
                         case .processo(processo: let processo):
-                            NotificationCenter.default.post(name: self.name, object: processo)
+                        NotificationCenter.default.post(name: Notify.Tipo.Rodando.Name, object: processo)
                         case .buraco:
                             break
                     }
@@ -223,13 +192,12 @@ class MemoriaRAM: ObservableObject{
                     
                     if processM.addTime(tempo: timer){
                         self.removeProcess(processo: process)
-                        NotificationCenter.default.post(name: self.nameFinalizou, object: processM)
+                        processM.isFinished = true
+                        NotificationCenter.default.post(name: Notify.Tipo.Finalizou.Name, object: processM)
                     }else{
-                        NotificationCenter.default.post(name: self.name, object: processM)
+                        NotificationCenter.default.post(name: Notify.Tipo.Rodando.Name, object: processM)
                     }
                     
-                    self.atualizarProcesso(processo: processM)
-                    self.mergeBuracos()
 
                 }
                 

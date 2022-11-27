@@ -16,8 +16,6 @@ class Controladora: ObservableObject{
     var n1:Notify
     
     var cancellables = Set<AnyCancellable>()
-    let callFinalizou = Notification.Name("finalizou")
-    let callEspera = Notification.Name("espera")
     
     var queue = Queue<Process>()
     @Published var processes = Array<Process>()
@@ -26,39 +24,18 @@ class Controladora: ObservableObject{
     let memoria = 40
     var memoriaAlocada = 0
     
-    
-    func firstFit(completion: (Process) -> ()){
-        if let process = self.queue.dequeue(){
-            completion(process)
-        }
-    }
-    
-    func bestFit(completion: (Process) -> ()){
-        if let process = self.queue.dequeue(){
-            completion(process)
-        }
-    }
-    
-    func worstFit(completion: (Process) -> ()){
-        if let process = self.queue.dequeue(){
-            completion(process)
-        }
-    }
-    
-    
+
     
     func updateProcess(processo: Process){
-        DispatchQueue.main.async {
             if let index = try? self.processes.firstIndex(where: {$0.id == processo.id}) {
                 self.processes[index] = processo
             }
-        }
+        
     }
     func addProcess(process: Process){
         
-        DispatchQueue.main.async {
-            self.processes.append(process)
-        }
+        self.processes.append(process)
+        
         NotificationCenter.default.post(name: n1.name, object: process)
     }
     
@@ -70,12 +47,9 @@ class Controladora: ObservableObject{
         self.n1.register()
         
         
-        NotificationCenter.default
-            
-            .publisher(for: callEspera)
-            .merge(with:  NotificationCenter.default
-            .publisher(for: callFinalizou))
-        
+            Notify.Tipo.Espera.It
+           // .receive(on: DispatchQueue.global(qos: .userInteractive))
+            .merge(with: Notify.Tipo.Finalizou.It)
             .sink { [unowned self] notification in
             if let process = notification.object as? Process{
                 
@@ -95,7 +69,7 @@ class Controladora: ObservableObject{
                     if(self.memoriaAlocada + process.tamanhoProcesso <= self.memoria){
                         
                         //executa o algoritmo
-                        self.firstFit { process in
+                        if let process = self.queue.dequeue(){
                             let ram = MemoriaRAMModel(tipo: .processo(processo: process))
                             NotificationCenter.default.post(name:Notification.Name("rodando"), object: ram)
                             self.memoriaAlocada += process.tamanhoProcesso
