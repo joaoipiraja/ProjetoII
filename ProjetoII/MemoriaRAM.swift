@@ -27,9 +27,9 @@ class MemoriaRAM: ObservableObject{
     
     var notificationRodando: Notify
     var notificationFinalizou: Notify
+    var estrategiaAlocacao: EstrategiaAlocacao
     
-    
-    let memoria = 40
+    var memoria: Int
     @Published var memoriaAlocada = 0
     
     
@@ -165,7 +165,7 @@ class MemoriaRAM: ObservableObject{
 
         
                 
-        if let index = findRole(alg: .worstFit){
+        if let index = findRole(alg:  self.estrategiaAlocacao){
                 
                 
                 switch ram.tipo{
@@ -234,21 +234,21 @@ class MemoriaRAM: ObservableObject{
        
     }
     
-    func inicial(){
-        let so = MemoriaRAMModel(tipo: .so, posicaoInicio: 0, posicaoFim: 99)
-        let buraco = MemoriaRAMModel(tipo: .buraco, posicaoInicio: 100, posicaoFim: 140)
-        
-        rams.append(so)
-        rams.append(buraco)
-
-    }
+  
     
-    init(nr: Notify, nf: Notify){
+    init(nr: Notify, nf: Notify, memoriaSize:Int, so: MemoriaRAMModel, alocacao: EstrategiaAlocacao){
         
         self.notificationRodando = nr
         self.notificationFinalizou = nf
         
-        self.inicial()
+        let buraco = MemoriaRAMModel(tipo: .buraco, posicaoInicio: so.posicaoFim!+1, posicaoFim: so.posicaoFim!+1+memoriaSize)
+        
+        self.memoria = memoriaSize
+        self.estrategiaAlocacao = alocacao
+        
+        rams.append(so)
+        rams.append(buraco)
+        
         self.cancellable =
             self.notificationRodando.publisher
             .zip(timer)

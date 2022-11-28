@@ -31,9 +31,7 @@ struct ContentView: View {
         nr.register()
         ne.register()
         
-
-
-        ram = .init(nr: nr, nf: nf)
+        ram = .init(nr: nr, nf: nf, memoriaSize: 40, so: .init(tipo: .so, posicaoInicio: 0, posicaoFim: 99),alocacao: .worstFit)
         c = .init(nf: nf, ne: ne)
     }
     
@@ -74,11 +72,16 @@ struct ContentView: View {
                 Text("Espera")
             }
             
-            HStack{
-                ForEach(ram.rams, id: \.id) { ram in
-                    Card(ram: ram)
+            Section{
+                HStack{
+                    ForEach(ram.rams, id: \.id) { ram in
+                        Card(ram: ram)
+                    }
                 }
+            }header: {
+                Text("Memoria - \(ram.memoriaAlocada)MB usado")
             }
+           
              
             
             Section {
