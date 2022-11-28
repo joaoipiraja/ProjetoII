@@ -11,45 +11,44 @@ import Combine
 class Controladora: ObservableObject{
  
     
+    
     //Recebe tanto quem espera, quanto finaliza
     
-    var n1:Notify
+    var notificationEspera:Notify
+    var notificationFinalizou:Notify
+
     
     var cancellables = Set<AnyCancellable>()
     
-    var queue = Queue<Process>()
-    @Published var processes = Array<Process>()
+    @Published var processesFinalizados = Array<Process>()
+    @Published var processesEntrou = Array<Process>()
 
-    
-    let memoria = 40
-    var memoriaAlocada = 0
     
 
     
-    func updateProcess(processo: Process){
-            if let index = try? self.processes.firstIndex(where: {$0.id == processo.id}) {
-                self.processes[index] = processo
-            }
-        
-    }
+//
+//    func updateProcess(processo: Process){
+//            if let index = try? self.processes.firstIndex(where: {$0.id == processo.id}) {
+//                self.processes[index] = processo
+//            }
+//
+//    }
     func addProcess(process: Process){
         
-        self.processes.append(process)
+        self.processesEntrou.append(process)
         
-        NotificationCenter.default.post(name: n1.name, object: process)
+        NotificationCenter.default.post(name: self.notificationEspera.name, object: process)
     }
     
     
     
-    init(){
-     
-        self.n1 = Notify(name: "espera")
-        self.n1.register()
+    init(nf: Notify, ne: Notify){
+
+            self.notificationEspera = ne
+            self.notificationFinalizou = nf
         
-        
-            Notify.Tipo.Espera.It
-           // .receive(on: DispatchQueue.global(qos: .userInteractive))
-            .merge(with: Notify.Tipo.Finalizou.It)
+            self.notificationEspera.publisher
+            .merge(with: self.notificationFinalizou.publisher)
             .sink { [unowned self] notification in
             if let process = notification.object as? Process{
                 
@@ -58,25 +57,19 @@ class Controladora: ObservableObject{
                 if(process.isFinished){
                     // foi finalizado
                     
-                    self.memoriaAlocada -= process.tamanhoProcesso
-                    updateProcess(processo: process)
+                    processesFinalizados.append(process)
                     
                 }else{
-                    // vai para fila de espera
-                    self.queue.enqueue(process)
+                    
+                    let ram = MemoriaRAMModel(tipo: .processo(processo: process))
+                    NotificationCenter.default.post(name:Notification.Name("rodando"), object: ram)
+                    
+                    //self.queue.enqueue(process)
+
                 }
-                    //Verifica se há espaço
-                    if(self.memoriaAlocada + process.tamanhoProcesso <= self.memoria){
-                        
-                        //executa o algoritmo
-                        if let process = self.queue.dequeue(){
-                            let ram = MemoriaRAMModel(tipo: .processo(processo: process))
-                            NotificationCenter.default.post(name:Notification.Name("rodando"), object: ram)
-                            self.memoriaAlocada += process.tamanhoProcesso
-                        }
-                       
-                    }
-                
+
+             
+              
                
 
             }

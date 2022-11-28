@@ -12,21 +12,67 @@ import Combine
 
 
 struct ContentView: View {
+    
         
-    @ObservedObject var ram = MemoriaRAM()
-    @ObservedObject var c = Controladora()
+    @ObservedObject var ram: MemoriaRAM
+    @ObservedObject var c: Controladora
+    
+    @State private var showingAlert = false
+    
+    var nf: Notify = .init(name: "finalizou")
+    var nr: Notify = .init(name: "rodando")
+    var ne: Notify = .init(name: "esperando")
+
+    
+    init(){
+
+        
+        nf.register()
+        nr.register()
+        ne.register()
+        
+
+
+        ram = .init(nr: nr, nf: nf)
+        c = .init(nf: nf, ne: ne)
+    }
     
 
     func calculateTempoMedio() -> Double{
-        let soma = c.processes.filter{ $0.isFinished}.reduce(0.0) { $0 + ($1.tempoAtual! - $1.tempoCriacao)}
-        return soma/Double(c.processes.count)
+        let soma = c.processesFinalizados.filter{ $0.isFinished}.reduce(0.0) { $0 + ($1.tempoAtual! - $1.tempoCriacao)}
+        return soma/Double(c.processesFinalizados.count)
     }
+    
+    
 
     var body: some View {
         
         VStack{
             
             
+            
+           
+
+            Section {
+                List{
+                
+
+                    ForEach(ram.queue.elements) { ram in
+                        switch ram.tipo{
+                            case .buraco:
+                                Text("")
+                            case .processo(processo: let p):
+                                Text("\(p.description)")
+                            case .so:
+                                Text("")
+                        }
+                    
+                    }
+
+                }
+            } header: {
+                Text("Espera")
+            }
             
             HStack{
                 ForEach(ram.rams, id: \.id) { ram in
@@ -37,22 +83,8 @@ struct ContentView: View {
             
             Section {
                 List{
-                    
-                    ForEach(c.queue.elements.filter{ !$0.isFinished }, id: \.id) { process in
-                        
-                        Text("\(process.description)")
 
-                    }
-                    
-                }
-            } header: {
-                Text("Espera")
-            }
-            
-            Section {
-                List{
-
-                    ForEach(c.processes.filter{ $0.isFinished }, id: \.id) { process in
+                    ForEach(c.processesFinalizados, id: \.id) { process in
 
                         Text("\(process.description)")
 
@@ -62,7 +94,6 @@ struct ContentView: View {
             } header: {
                 VStack{
                     Text("Finalizados")
-                    Text("Tempo Medio = \(calculateTempoMedio())")
                 }
             }
 
@@ -72,12 +103,12 @@ struct ContentView: View {
             
             
             Button {
-                c.addProcess(process: .init(duracaoProcesso: 10, tamanhoProcesso: 10))
-                c.addProcess(process: .init(duracaoProcesso: 10, tamanhoProcesso: 10))
-                c.addProcess(process: .init(duracaoProcesso: 10, tamanhoProcesso: 10))
+                c.addProcess(process: .init(duracaoProcesso: 10, tamanhoProcesso: 20))
+                c.addProcess(process: .init(duracaoProcesso: 10, tamanhoProcesso: 20))
                 c.addProcess(process: .init(duracaoProcesso: 10, tamanhoProcesso: 5))
+                c.addProcess(process: .init(duracaoProcesso: 10, tamanhoProcesso:  30))
                 c.addProcess(process: .init(duracaoProcesso: 10, tamanhoProcesso: 2))
-                c.addProcess(process: .init(duracaoProcesso: 10, tamanhoProcesso: 10))
+                c.addProcess(process: .init(duracaoProcesso: 10, tamanhoProcesso: 7))
                 c.addProcess(process: .init(duracaoProcesso: 10, tamanhoProcesso: 5))
                 c.addProcess(process: .init(duracaoProcesso: 10, tamanhoProcesso: 10))
                 c.addProcess(process: .init(duracaoProcesso: 10, tamanhoProcesso: 3))
@@ -86,7 +117,17 @@ struct ContentView: View {
             } label: {
                 Text("Teste")
             }
-        }.padding()
+        }
+       
+        .onReceive(c.processesFinalizados.publisher, perform: { _ in
+            showingAlert = c.processesEntrou.count == c.processesFinalizados.count
+            
+        }).alert("TempoMedio = \(calculateTempoMedio())s", isPresented: $showingAlert) {
+            Button("OK", role: .cancel) {
+                showingAlert = false
+            }
+        }
+        .padding()
 
        
 

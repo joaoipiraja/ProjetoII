@@ -7,39 +7,36 @@
 
 import Foundation
 
-struct Publisher{
-    
-    var Name: Notification.Name
-    var It: NotificationCenter.Publisher{
-        get{
-            return NotificationCenter.default.publisher(for: Name)
-        }
-    }
-    
-    
-    
-}
+
+//static var Rodando = Publisher(Name: Notification.Name("rodando"))
+//static var Finalizou = Publisher(Name: Notification.Name("finalizou"))
+//static var Espera = Publisher(Name: Notification.Name("espera"))
+
 
 struct Notify{
     
     
-    struct Tipo{
-        
-        static var Rodando = Publisher(Name: Notification.Name("rodando"))
-        static var Finalizou = Publisher(Name: Notification.Name("finalizou"))
-        static var Espera = Publisher(Name: Notification.Name("espera"))
-        
-    }
+
     
     //Cria uma notificação
     
     let center = NotificationCenter.default
+    
+    private var nameString: String
     var name: NSNotification.Name
     private var token: NSObjectProtocol?
+    
     var queue = OperationQueue.current
+    
+    var publisher: NotificationCenter.Publisher{
+        get{
+            return NotificationCenter.default.publisher(for: self.name)
+        }
+    }
 
     
     init(name: String){
+        self.nameString = name
         self.name = Notification.Name(name)
     }
     
@@ -50,6 +47,7 @@ struct Notify{
     }
     
     mutating func register(){
+        unregister()
         if(token == nil){
             
             self.token = center.addObserver(forName: name, object: nil, queue: queue) { (note) in
