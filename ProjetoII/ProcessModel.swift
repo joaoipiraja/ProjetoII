@@ -22,7 +22,8 @@ class Process: ObservableObject{
     let duracaoProcesso: Int
     let tamanhoProcesso: Int
     
-   @Published var tempoCriacao = Date()
+   var tempoCriacaoSeconds: Int
+   @Published var tempoCriacao: Date? = nil
    @Published var tempoInicio: Date? = nil
    @Published private var tempoFinal: Date? = nil
    @Published var tempoAtual: Date? = nil
@@ -31,16 +32,17 @@ class Process: ObservableObject{
     
     public var description: String {
             return
-            "Process(\(idString)): \n DuracaoProcesso = \(duracaoProcesso);\n tamanhoProcesso = \(tamanhoProcesso); tempoCriacao = \(tempoCriacao.toHourFormat()); tempoInicio = \(tempoInicio?.toHourFormat() ?? "-"); tempoAtual = \(tempoAtual?.toHourFormat() ?? "-")} "
+            "Process(\(idString)): \n DuracaoProcesso = \(duracaoProcesso);\n tamanhoProcesso = \(tamanhoProcesso); tempoCriacao = \(tempoCriacao?.toHourFormat() ?? "-"); tempoInicio = \(tempoInicio?.toHourFormat() ?? "-"); tempoAtual = \(tempoAtual?.toHourFormat() ?? "-")} "
     
     
     }
     
     @Published var isFinished: Bool = false
     
-    init(duracaoProcesso: Int, tamanhoProcesso: Int) {
+    init(duracaoProcesso: Int, tamanhoProcesso: Int, tempoCriacao: Int) {
         self.duracaoProcesso = duracaoProcesso
         self.tamanhoProcesso = tamanhoProcesso
+        self.tempoCriacaoSeconds = tempoCriacao
     }
     
     func addTime(tempo: Date) -> Bool{

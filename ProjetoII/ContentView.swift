@@ -38,7 +38,7 @@ struct ContentView: View {
     
 
     func calculateTempoMedio() -> Double{
-        let soma = c.processesFinalizados.filter{ $0.isFinished}.reduce(0.0) { $0 + ($1.tempoAtual! - $1.tempoCriacao)}
+        let soma = c.processesFinalizados.filter{ $0.isFinished}.reduce(0.0) { $0 + ($1.tempoAtual! - $1.tempoCriacao!)}
         return soma/Double(c.processesFinalizados.count)
     }
     
@@ -49,7 +49,16 @@ struct ContentView: View {
         VStack{
             
             
-            
+            Section{
+                List{
+                    ForEach(c.processesEntrou.filter{$0.tempoCriacao == nil}.sorted { $0.tempoCriacaoSeconds < $1.tempoCriacaoSeconds}, id: \.id) { p in
+                        
+                        Text("Processo \(p.idString) -> Daqui \(p.tempoCriacaoSeconds)s")
+                    }
+                }
+            }header: {
+                Text("Esperando Executar")
+            }
            
 
             Section {
@@ -75,7 +84,7 @@ struct ContentView: View {
             
             Section{
                 HStack{
-                    ForEach(ram.rams, id: \.id) { ram in
+                    ForEach(ram.viewModel.rams, id: \.id) { ram in
                         Card(ram: ram)
                     }
                 }
@@ -107,23 +116,28 @@ struct ContentView: View {
             
             
             Button {
-                c.addProcess(process: .init(duracaoProcesso: 10, tamanhoProcesso: 20))
-                c.addProcess(process: .init(duracaoProcesso: 10, tamanhoProcesso: 20))
-                c.addProcess(process: .init(duracaoProcesso: 10, tamanhoProcesso: 5))
-                c.addProcess(process: .init(duracaoProcesso: 10, tamanhoProcesso:  30))
-                c.addProcess(process: .init(duracaoProcesso: 10, tamanhoProcesso: 2))
-                c.addProcess(process: .init(duracaoProcesso: 10, tamanhoProcesso: 7))
-                c.addProcess(process: .init(duracaoProcesso: 10, tamanhoProcesso: 5))
-                c.addProcess(process: .init(duracaoProcesso: 10, tamanhoProcesso: 10))
-                c.addProcess(process: .init(duracaoProcesso: 10, tamanhoProcesso: 3))
-             
+                c.addProcess(process: .init(duracaoProcesso: 10, tamanhoProcesso: 20, tempoCriacao: 5))
+                
+                c.addProcess(process: .init(duracaoProcesso: 10, tamanhoProcesso: 20, tempoCriacao: 10))
+                
+                c.addProcess(process: .init(duracaoProcesso: 10, tamanhoProcesso: 5, tempoCriacao: 10))
+                
+                c.addProcess(process: .init(duracaoProcesso: 10, tamanhoProcesso: 2, tempoCriacao: 15))
+                c.addProcess(process: .init(duracaoProcesso: 10, tamanhoProcesso: 20, tempoCriacao: 5))
+                
+                c.addProcess(process: .init(duracaoProcesso: 10, tamanhoProcesso: 20, tempoCriacao: 20))
+                
+                c.addProcess(process: .init(duracaoProcesso: 10, tamanhoProcesso: 5, tempoCriacao: 25))
+                
+                c.addProcess(process: .init(duracaoProcesso: 10, tamanhoProcesso: 2, tempoCriacao: 30))
+            
                 
             } label: {
                 Text("Iniciar simulação")
             }
         }
        
-        .onReceive(ram.rams.publisher, perform: { r in
+        .onReceive(ram.viewModel.rams.publisher, perform: { r in
             print(r.posicaoInicio)
             print(r.posicaoFim)
             print(r.tipo)
