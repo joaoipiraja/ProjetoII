@@ -20,10 +20,10 @@ enum EstrategiaAlocacao{
 class MemoriaRAM: ObservableObject{
     
     var cancellable: Cancellable?
-    var timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
+    var timer = Timer.publish(every: 1, on: .current, in: .default).autoconnect()
     
-    @Published var queue = Queue<MemoriaRAMModel>()
-    @Published var rams: Array<MemoriaRAMModel> = []
+    @Published var queue: Queue<MemoriaRAMModel> = .init()
+    @Published  var rams: Array<MemoriaRAMModel> = []
     
     var notificationRodando: Notify
     var notificationFinalizou: Notify
@@ -137,7 +137,16 @@ class MemoriaRAM: ObservableObject{
     
     func enqueue(){
   
-                if(self.memoriaAlocada <= self.memoria){
+        if(self.memoriaAlocada + (self.queue.elements.map({ r in
+            switch r.tipo{
+            case .so:
+                return 0
+            case .processo(processo: let p):
+                return p.tamanhoProcesso
+            case .buraco:
+                return 0
+            }
+        }).first ?? 0) <= self.memoria){
                         //executa o algoritmo
                         if let fila = self.queue.dequeue(){
                             
@@ -147,9 +156,10 @@ class MemoriaRAM: ObservableObject{
                             case .so:
                                 break
                             case .processo(processo: let p):
+
+                                NotificationCenter.default.post(name: self.notificationRodando.name, object: p)
                                 addProcess(ram: fila)
                                 self.memoriaAlocada += p.tamanhoProcesso
-                                NotificationCenter.default.post(name: self.notificationRodando.name, object: p)
 
                             case .buraco:
                                 break
@@ -227,7 +237,6 @@ class MemoriaRAM: ObservableObject{
             }
         
         self.rams =  self.rams.sorted { $0.posicaoFim! < $1.posicaoFim!}
-            
                 
         
 
@@ -236,7 +245,7 @@ class MemoriaRAM: ObservableObject{
     
   
     
-    init(nr: Notify, nf: Notify, memoriaSize:Int, so: MemoriaRAMModel, alocacao: EstrategiaAlocacao){
+    init( nr: Notify, nf: Notify, memoriaSize:Int, so: MemoriaRAMModel, alocacao: EstrategiaAlocacao){
         
         self.notificationRodando = nr
         self.notificationFinalizou = nf
@@ -246,8 +255,8 @@ class MemoriaRAM: ObservableObject{
         self.memoria = memoriaSize
         self.estrategiaAlocacao = alocacao
         
-        rams.append(so)
-        rams.append(buraco)
+        self.rams.append(so)
+        self.rams.append(buraco)
         
         self.cancellable =
             self.notificationRodando.publisher

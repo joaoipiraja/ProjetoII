@@ -16,6 +16,7 @@ struct ContentView: View {
         
     @ObservedObject var ram: MemoriaRAM
     @ObservedObject var c: Controladora
+
     
     @State private var showingAlert = false
     
@@ -31,7 +32,7 @@ struct ContentView: View {
         nr.register()
         ne.register()
         
-        ram = .init(nr: nr, nf: nf, memoriaSize: 40, so: .init(tipo: .so, posicaoInicio: 0, posicaoFim: 99),alocacao: .worstFit)
+        ram = .init(nr: nr, nf: nf, memoriaSize: 40, so: .init(tipo: .so, posicaoInicio: 0, posicaoFim: 99),alocacao: .bestFit)
         c = .init(nf: nf, ne: ne)
     }
     
@@ -79,7 +80,7 @@ struct ContentView: View {
                     }
                 }
             }header: {
-                Text("Memoria - \(ram.memoriaAlocada)MB usado")
+                Text("Memoria - \(ram.memoriaAlocada)/\(ram.memoria) MB")
             }
            
              
@@ -118,10 +119,16 @@ struct ContentView: View {
              
                 
             } label: {
-                Text("Teste")
+                Text("Iniciar simulação")
             }
         }
        
+        .onReceive(ram.rams.publisher, perform: { r in
+            print(r.posicaoInicio)
+            print(r.posicaoFim)
+            print(r.tipo)
+
+        })
         .onReceive(c.processesFinalizados.publisher, perform: { _ in
             showingAlert = c.processesEntrou.count == c.processesFinalizados.count
             

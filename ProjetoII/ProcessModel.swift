@@ -24,16 +24,19 @@ class Process: ObservableObject{
     
    @Published var tempoCriacao = Date()
    @Published var tempoInicio: Date? = nil
-    private var tempoFinal: Date? = nil
-    @Published var tempoAtual: Date? = nil
+   @Published private var tempoFinal: Date? = nil
+   @Published var tempoAtual: Date? = nil
     
     
     
-    public var description: String { return
-        "Process(\(idString)): \n DuracaoProcesso = \(duracaoProcesso);\n tamanhoProcesso = \(tamanhoProcesso); tempoCriacao = \(tempoCriacao); tempoInicio = \(tempoInicio); tempoAtual = \(tempoAtual)} "
+    public var description: String {
+            return
+            "Process(\(idString)): \n DuracaoProcesso = \(duracaoProcesso);\n tamanhoProcesso = \(tamanhoProcesso); tempoCriacao = \(tempoCriacao.toHourFormat()); tempoInicio = \(tempoInicio?.toHourFormat() ?? "-"); tempoAtual = \(tempoAtual?.toHourFormat() ?? "-")} "
+    
+    
     }
     
-    var isFinished: Bool = false
+    @Published var isFinished: Bool = false
     
     init(duracaoProcesso: Int, tamanhoProcesso: Int) {
         self.duracaoProcesso = duracaoProcesso
