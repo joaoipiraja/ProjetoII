@@ -78,13 +78,13 @@ class MemoriaRAM: ObservableObject{
             
             switch ram.tipo{
             case .so:
-                break
+                return false
             case .processo(processo: let p):
                 return p.id == processo.id
             case .buraco:
-                break
+                return false
+
             }
-            return false
         })
     }
 
@@ -93,7 +93,7 @@ class MemoriaRAM: ObservableObject{
             if let index = self.index(processo: processo){
                 self.viewModel.rams[index].tipo = .buraco
             }
-            self.mergeBuracos()
+        self.mergeBuracos()
 
     }
     
@@ -111,7 +111,6 @@ class MemoriaRAM: ObservableObject{
                 
                 ram.posicaoInicio = self.viewModel.rams[index].posicaoInicio
                 
-                var cont = 1
                 var index_final = -1
                     
                     for i in index+1..<self.viewModel.rams.count{
@@ -123,12 +122,9 @@ class MemoriaRAM: ObservableObject{
                             case .processo(processo: _):
                                 break
                             case .buraco:
-                                if(i == index+1){
-                                    ram.posicaoFim = self.viewModel.rams[i].posicaoFim!
-
-                                }else{
-                                    ram.posicaoFim = self.viewModel.rams[i].posicaoFim!
-                                }
+                            
+                                ram.posicaoFim = self.viewModel.rams[i].posicaoFim
+                               
                                 index_final = i
                                 break
                             
@@ -143,7 +139,7 @@ class MemoriaRAM: ObservableObject{
 
             }
         
-            self.viewModel.objectWillChange.send()
+           self.viewModel.objectWillChange.send()
         
            
         
@@ -181,13 +177,13 @@ class MemoriaRAM: ObservableObject{
                         }
                 }
         
-        self.viewModel.objectWillChange.send()
+             self.viewModel.objectWillChange.send()
 
     }
     
     func addProcess(ram: MemoriaRAMModel){
         
-        
+
                 
         if let index = findRole(alg:  self.estrategiaAlocacao){
                 
@@ -207,9 +203,11 @@ class MemoriaRAM: ObservableObject{
                         ram.posicaoInicio = aux.posicaoInicio
                         ram.posicaoFim =  aux.posicaoInicio! + processo.tamanhoProcesso
                     
-                        if((ram.posicaoFim! -  ram.posicaoInicio!) >= (self.memoria - self.memoriaAlocada) && (ram.posicaoFim! -  ram.posicaoInicio!) > 0){
-                            self.viewModel.rams[index] = ram
-                        }else{
+                    if((ram.posicaoFim! -  ram.posicaoInicio!) >= (self.memoria - self.memoriaAlocada)){
+                        
+                        self.viewModel.rams[index] = ram
+                        
+                    }else{
                             aux.posicaoInicio = ram.posicaoFim! + 1
 
                             if(index+1 > self.viewModel.rams.count){
@@ -276,8 +274,21 @@ class MemoriaRAM: ObservableObject{
                         if processM.addTime(tempo: timer){
                             self.removeProcess(processo: process)
                             processM.isFinished = true
-                            memoriaAlocada -= process.tamanhoProcesso
                             NotificationCenter.default.post(name: self.notificationFinalizou.name, object: processM)
+                            
+                            memoriaAlocada = self.viewModel.rams.map { ram in
+                                switch ram.tipo{
+
+                                case .so:
+                                    return 0
+                                case .processo(processo: let p):
+                                    return p.tamanhoProcesso
+                                case .buraco:
+                                    return 0
+                                }
+                            }.reduce(0){$0 + $1}
+
+                            
                         }else{
                             NotificationCenter.default.post(name: self.notificationRodando.name, object: processM)
                         }

@@ -79,8 +79,8 @@ struct Card: View{
 
 
 
-struct Card_Previews: PreviewProvider {
-    static var previews: some View {
-        Card(ram: .MOCK).frame(width: 300, height: 350)
-    }
-}
+//struct Card_Previews: PreviewProvider {
+//    static var previews: some View {
+//        // Card(ram: .MOCK).frame(width: 300, height: 350)
+//    }
+//}

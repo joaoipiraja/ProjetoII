@@ -89,7 +89,7 @@ struct ContentView: View {
                     }
                 }
             }header: {
-                Text("Memoria - \(ram.memoriaAlocada)/\(ram.memoria) MB")
+                Text("Memoria - \(ram.memoriaAlocada)/\(ram.memoria)MB")
             }
            
              
@@ -116,33 +116,33 @@ struct ContentView: View {
             
             
             Button {
-                c.addProcess(process: .init(duracaoProcesso: 10, tamanhoProcesso: 20, tempoCriacao: 5))
+                c.addProcess(process: .init(duracaoProcesso: 10, tamanhoProcesso: 20, tempoCriacao: 40))
                 
                 c.addProcess(process: .init(duracaoProcesso: 10, tamanhoProcesso: 20, tempoCriacao: 10))
                 
                 c.addProcess(process: .init(duracaoProcesso: 10, tamanhoProcesso: 5, tempoCriacao: 10))
                 
                 c.addProcess(process: .init(duracaoProcesso: 10, tamanhoProcesso: 2, tempoCriacao: 15))
-                c.addProcess(process: .init(duracaoProcesso: 10, tamanhoProcesso: 20, tempoCriacao: 5))
+                c.addProcess(process: .init(duracaoProcesso: 5, tamanhoProcesso: 20, tempoCriacao: 50))
                 
                 c.addProcess(process: .init(duracaoProcesso: 10, tamanhoProcesso: 20, tempoCriacao: 20))
                 
-                c.addProcess(process: .init(duracaoProcesso: 10, tamanhoProcesso: 5, tempoCriacao: 25))
+                c.addProcess(process: .init(duracaoProcesso: 20, tamanhoProcesso: 5, tempoCriacao: 25))
                 
-                c.addProcess(process: .init(duracaoProcesso: 10, tamanhoProcesso: 2, tempoCriacao: 30))
+                c.addProcess(process: .init(duracaoProcesso: 30, tamanhoProcesso: 2, tempoCriacao: 100))
             
                 
             } label: {
                 Text("Iniciar simulação")
-            }
+            }.disabled(c.processesEntrou.count != c.processesFinalizados.count)
         }
        
-        .onReceive(ram.viewModel.rams.publisher, perform: { r in
-            print(r.posicaoInicio)
-            print(r.posicaoFim)
-            print(r.tipo)
-
-        })
+//        .onReceive(ram.viewModel.rams.publisher, perform: { r in
+//            print(r.posicaoInicio)
+//            print(r.posicaoFim)
+//            print(r.tipo)
+//
+//        })
         .onReceive(c.processesFinalizados.publisher, perform: { _ in
             showingAlert = c.processesEntrou.count == c.processesFinalizados.count
             
