@@ -90,59 +90,88 @@ class MemoriaRAM: ObservableObject{
 
     
     func removeProcess(processo: Process){
+        
             if let index = self.index(processo: processo){
                 self.viewModel.rams[index].tipo = .buraco
+
             }
-        self.mergeBuracos()
+            self.mergeBuracos()
 
     }
     
     
     func mergeBuracos(){
         
-            self.viewModel.rams =  self.viewModel.rams.sorted { $0.posicaoInicio! < $1.posicaoInicio!}
         
-            var rams_aux =  self.viewModel.rams
-        
-            var espaco: Int = 0
-        
+        if let indexFirst = try? self.viewModel.rams.firstIndex(where: {$0.tipo == .buraco}){
             
-            if let index = try? rams_aux.firstIndex(where: {$0.tipo == .buraco}){
-                
-                
-                espaco += rams_aux[index].posicaoFim! - rams_aux[index].posicaoInicio!
-                
-                var index_final = -1
-                    
-                    for i in index+1..<rams_aux.count{
-                        
-                        switch rams_aux[i].tipo{
-                            
-                            case .so:
-                                break
-                            case .processo(processo: _):
-                                break
-                            case .buraco:
-                            
-                                espaco += rams_aux[i].posicaoFim! - rams_aux[i].posicaoInicio!
-                               
-                                index_final = i
-                            
-                        }
-
-                    }
-                
-                
-                if index_final >= 0 {
-                    let aux = MemoriaRAMModel(tipo: .buraco, posicaoInicio: rams_aux[index].posicaoInicio, posicaoFim: rams_aux[index].posicaoInicio! + (self.memoria - self.memoriaAlocada))
-                    self.viewModel.rams[index] = aux
-                    self.viewModel.rams.removeSubrange(index+1...index_final)
+            if let indexLast = try? self.viewModel.rams.lastIndex(where: {$0.tipo == .buraco}){
+                let ram = MemoriaRAMModel(tipo: .buraco,
+                                          posicaoInicio: self.viewModel.rams[indexFirst].posicaoInicio ,
+                                          posicaoFim: self.viewModel.rams[indexLast].posicaoFim! - (indexLast - indexFirst))
+               
+                if(indexLast > indexFirst){
+                    self.viewModel.rams[indexFirst] = ram
+                    self.viewModel.rams.removeSubrange(indexFirst+1...indexLast)
                 }
-
+                
             }
-        
-        
-           
+        }
+        //     0         1                2
+        // [0 1 2 3] [4 5 6 7] 8 9 10 [11 12 13]
+        // 0 1 2 3 4 5 6 7 8 9 9 10
+        /*
+         index = 1
+         index_final = 2     ultimo buraco da memoria
+         cont = 0, 1        qntd de vezes que pulou um buraco
+         */
+      
+//            var soma: Int = 0
+//
+//
+//            if let index = try? self.viewModel.rams.firstIndex(where: {$0.tipo == .buraco}){
+//
+//                print(index)
+//
+//
+//                var index_final = -1
+//                    // 0, 1, 2
+//                    // index = 1
+//                    for i in 0..<self.viewModel.rams.count{
+//
+//
+//                            if self.viewModel.rams[i].tipo == .buraco{
+//                                soma += self.viewModel.rams[i].posicaoFim! - self.viewModel.rams[i].posicaoInicio!
+//                                index_final = i
+//                            }
+//
+//
+//
+//                    }
+//
+//
+//                if index_final >= 0 {
+//
+//
+//                    /*
+//                     0        4     8
+//                    S.O.      B     B
+//                     3        7     10
+//                     */
+//
+//                        let aux = MemoriaRAMModel(
+//                            tipo: .buraco,
+//                            posicaoInicio: self.viewModel.rams[index].posicaoInicio, // 4
+//                            posicaoFim: self.viewModel.rams[index].posicaoFim! + soma) // 9
+//                        self.viewModel.rams[index] = aux
+//
+//                    self.viewModel.rams.removeSubrange(index+1...index_final)
+//                }
+//
+//            }
+//
+//
+//
         
     }
     
@@ -212,32 +241,31 @@ class MemoriaRAM: ObservableObject{
                     
                         var aux = self.viewModel.rams[index]
                     
-                        let space = aux.posicaoFim! - aux.posicaoInicio! //40
-
                 
                         ram.posicaoInicio = aux.posicaoInicio //100
                         ram.posicaoFim =  aux.posicaoInicio! + processo.tamanhoProcesso //101
                     
                         aux.posicaoInicio = ram.posicaoFim! + 1 //102
-                        aux.posicaoFim =  aux.posicaoInicio! + ( space - processo.tamanhoProcesso)
+                        aux.posicaoFim =  aux.posicaoFim! + 1
                         
                     
-                    if((ram.posicaoFim! -  ram.posicaoInicio!) >= self.memoria - self.memoriaAlocada){
+                    if((aux.posicaoFim! -  aux.posicaoInicio!) <= self.memoria - self.memoriaAlocada){
                         
-                        self.viewModel.rams[index] = ram
+                        
+                        if(index+1 > self.viewModel.rams.count){
+                            self.viewModel.rams[index] = ram
+                            self.viewModel.rams[index+1] = aux
+                        }else{
+                            self.viewModel.rams[index] = ram
+                            self.viewModel.rams.append(aux)
+                        }
+                        
+                        
                         
                     }else{
-                   
+                        self.viewModel.rams[index] = ram
 
-                            if(index+1 > self.viewModel.rams.count){
-                                self.viewModel.rams[index] = ram
-                                self.viewModel.rams[index+1] = aux
-                            }else{
-                                self.viewModel.rams[index] = ram
-                                self.viewModel.rams.append(aux)
-                            }
-                            
-                        }
+                    }
 
     
                     case .buraco:
@@ -292,7 +320,12 @@ class MemoriaRAM: ObservableObject{
                         if processM.addTime(tempo: timer){
                             
                             
+                            processM.isFinished = true
+                            NotificationCenter.default.post(name: self.notificationFinalizou.name, object: processM)
+
                             self.removeProcess(processo: process)
+                            
+                            
 
                             memoriaAlocada = self.viewModel.rams.map { ram in
                                 switch ram.tipo{
@@ -306,16 +339,15 @@ class MemoriaRAM: ObservableObject{
                                 }
                             }.reduce(0){$0 + $1}
                             
-                            processM.isFinished = true
-                            NotificationCenter.default.post(name: self.notificationFinalizou.name, object: processM)
-                         
+                            
 
                             
                         }else{
                             NotificationCenter.default.post(name: self.notificationRodando.name, object: processM)
 
                         }
-                        enqueue()
+                    enqueue()
+
 
 
                 }

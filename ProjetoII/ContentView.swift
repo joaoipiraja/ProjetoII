@@ -27,10 +27,9 @@ struct ContentView: View {
     
     init(){
 
-        
-        nf.register()
-        nr.register()
-        ne.register()
+        self.nf.register()
+        self.nr.register()
+        self.ne.register()
         
         ram = .init(nr: nr, nf: nf, memoriaSize: 40, so: .init(tipo: .so, posicaoInicio: 0, posicaoFim: 99),alocacao: .bestFit)
         c = .init(nf: nf, ne: ne)
@@ -116,14 +115,18 @@ struct ContentView: View {
             
             
             Button {
-                c.addProcess(process: .init(duracaoProcesso: 10, tamanhoProcesso: 20, tempoCriacao: 10))
                 
-                c.addProcess(process: .init(duracaoProcesso: 10, tamanhoProcesso: 20, tempoCriacao: 10))
                 
-                c.addProcess(process: .init(duracaoProcesso: 10, tamanhoProcesso: 5, tempoCriacao: 10))
+               
+                
+                c.addProcess(process: .init(duracaoProcesso: 10, tamanhoProcesso: 20, tempoCriacao: 0))
+                
+                c.addProcess(process: .init(duracaoProcesso: 10, tamanhoProcesso: 20, tempoCriacao: 0))
+                
+                c.addProcess(process: .init(duracaoProcesso: 40, tamanhoProcesso: 5, tempoCriacao: 0))
                 
                 c.addProcess(process: .init(duracaoProcesso: 10, tamanhoProcesso: 2, tempoCriacao: 10))
-                c.addProcess(process: .init(duracaoProcesso: 5, tamanhoProcesso: 20, tempoCriacao: 10))
+                c.addProcess(process: .init(duracaoProcesso: 100, tamanhoProcesso: 5, tempoCriacao: 10))
                 
                 c.addProcess(process: .init(duracaoProcesso: 10, tamanhoProcesso: 20, tempoCriacao: 10))
                 
