@@ -102,20 +102,21 @@ class MemoriaRAM: ObservableObject{
         
             self.viewModel.rams =  self.viewModel.rams.sorted { $0.posicaoInicio! < $1.posicaoInicio!}
         
-
-            let ram = MemoriaRAMModel(tipo: .buraco)
+            var rams_aux =  self.viewModel.rams
         
-         
+            var espaco: Int = 0
+        
             
-            if let index = try? self.viewModel.rams.firstIndex(where: {$0.tipo == .buraco}){
+            if let index = try? rams_aux.firstIndex(where: {$0.tipo == .buraco}){
                 
-                ram.posicaoInicio = self.viewModel.rams[index].posicaoInicio
+                
+                espaco += rams_aux[index].posicaoFim! - rams_aux[index].posicaoInicio!
                 
                 var index_final = -1
                     
-                    for i in index+1..<self.viewModel.rams.count{
+                    for i in index+1..<rams_aux.count{
                         
-                        switch self.viewModel.rams[i].tipo{
+                        switch rams_aux[i].tipo{
                             
                             case .so:
                                 break
@@ -123,23 +124,23 @@ class MemoriaRAM: ObservableObject{
                                 break
                             case .buraco:
                             
-                                ram.posicaoFim = self.viewModel.rams[i].posicaoFim
+                                espaco += rams_aux[i].posicaoFim! - rams_aux[i].posicaoInicio!
                                
                                 index_final = i
-                                break
                             
                         }
 
                     }
                 
+                
                 if index_final >= 0 {
-                    self.viewModel.rams[index] = ram
+                    let aux = MemoriaRAMModel(tipo: .buraco, posicaoInicio: rams_aux[index].posicaoInicio, posicaoFim: rams_aux[index].posicaoInicio! + (self.memoria - self.memoriaAlocada))
+                    self.viewModel.rams[index] = aux
                     self.viewModel.rams.removeSubrange(index+1...index_final)
                 }
 
             }
         
-           self.viewModel.objectWillChange.send()
         
            
         
@@ -156,7 +157,7 @@ class MemoriaRAM: ObservableObject{
             case .buraco:
                 return 0
             }
-        }).first ?? 0) <= self.memoria){
+        }).first ?? 0) < self.memoria){
                         //executa o algoritmo
                         if let fila = self.queue.dequeue(){
                             
@@ -169,7 +170,19 @@ class MemoriaRAM: ObservableObject{
 
                                 NotificationCenter.default.post(name: self.notificationRodando.name, object: p)
                                 addProcess(ram: fila)
-                                self.memoriaAlocada += p.tamanhoProcesso
+                                
+                                
+                                    memoriaAlocada = self.viewModel.rams.map { ram in
+                                    switch ram.tipo{
+
+                                    case .so:
+                                        return 0
+                                    case .processo(processo: let p):
+                                        return p.tamanhoProcesso
+                                    case .buraco:
+                                        return 0
+                                    }
+                                }.reduce(0){$0 + $1}
 
                             case .buraco:
                                 break
@@ -198,17 +211,23 @@ class MemoriaRAM: ObservableObject{
                         //Particiona
                     
                         var aux = self.viewModel.rams[index]
+                    
+                        let space = aux.posicaoFim! - aux.posicaoInicio! //40
 
                 
-                        ram.posicaoInicio = aux.posicaoInicio
-                        ram.posicaoFim =  aux.posicaoInicio! + processo.tamanhoProcesso
+                        ram.posicaoInicio = aux.posicaoInicio //100
+                        ram.posicaoFim =  aux.posicaoInicio! + processo.tamanhoProcesso //101
                     
-                    if((ram.posicaoFim! -  ram.posicaoInicio!) >= (self.memoria - self.memoriaAlocada)){
+                        aux.posicaoInicio = ram.posicaoFim! + 1 //102
+                        aux.posicaoFim =  aux.posicaoInicio! + ( space - processo.tamanhoProcesso)
+                        
+                    
+                    if((ram.posicaoFim! -  ram.posicaoInicio!) >= self.memoria - self.memoriaAlocada){
                         
                         self.viewModel.rams[index] = ram
                         
                     }else{
-                            aux.posicaoInicio = ram.posicaoFim! + 1
+                   
 
                             if(index+1 > self.viewModel.rams.count){
                                 self.viewModel.rams[index] = ram
@@ -229,7 +248,6 @@ class MemoriaRAM: ObservableObject{
         
         self.viewModel.rams =  self.viewModel.rams.sorted { $0.posicaoInicio! < $1.posicaoInicio!}
         
-        self.viewModel.objectWillChange.send()
 
         
 
@@ -272,10 +290,10 @@ class MemoriaRAM: ObservableObject{
                         var processM = process
                         
                         if processM.addTime(tempo: timer){
-                            self.removeProcess(processo: process)
-                            processM.isFinished = true
-                            NotificationCenter.default.post(name: self.notificationFinalizou.name, object: processM)
                             
+                            
+                            self.removeProcess(processo: process)
+
                             memoriaAlocada = self.viewModel.rams.map { ram in
                                 switch ram.tipo{
 
@@ -287,12 +305,17 @@ class MemoriaRAM: ObservableObject{
                                     return 0
                                 }
                             }.reduce(0){$0 + $1}
+                            
+                            processM.isFinished = true
+                            NotificationCenter.default.post(name: self.notificationFinalizou.name, object: processM)
+                         
 
                             
                         }else{
                             NotificationCenter.default.post(name: self.notificationRodando.name, object: processM)
+
                         }
-                    enqueue()
+                        enqueue()
 
 
                 }

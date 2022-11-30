@@ -51,9 +51,9 @@ struct ContentView: View {
             
             Section{
                 List{
-                    ForEach(c.processesEntrou.filter{$0.tempoCriacao == nil}.sorted { $0.tempoCriacaoSeconds < $1.tempoCriacaoSeconds}, id: \.id) { p in
+                    ForEach(c.processesEntrou.filter{$0.tempoCriacao == nil}, id: \.id) { p in
                         
-                        Text("Processo \(p.idString) -> Daqui \(p.tempoCriacaoSeconds)s")
+                        Text("Processo \(p.idString) -> Entrará daqui + \(p.tempoCriacaoSeconds)s")
                     }
                 }
             }header: {
@@ -116,20 +116,20 @@ struct ContentView: View {
             
             
             Button {
-                c.addProcess(process: .init(duracaoProcesso: 10, tamanhoProcesso: 20, tempoCriacao: 40))
+                c.addProcess(process: .init(duracaoProcesso: 10, tamanhoProcesso: 20, tempoCriacao: 10))
                 
                 c.addProcess(process: .init(duracaoProcesso: 10, tamanhoProcesso: 20, tempoCriacao: 10))
                 
                 c.addProcess(process: .init(duracaoProcesso: 10, tamanhoProcesso: 5, tempoCriacao: 10))
                 
-                c.addProcess(process: .init(duracaoProcesso: 10, tamanhoProcesso: 2, tempoCriacao: 15))
-                c.addProcess(process: .init(duracaoProcesso: 5, tamanhoProcesso: 20, tempoCriacao: 50))
+                c.addProcess(process: .init(duracaoProcesso: 10, tamanhoProcesso: 2, tempoCriacao: 10))
+                c.addProcess(process: .init(duracaoProcesso: 5, tamanhoProcesso: 20, tempoCriacao: 10))
                 
-                c.addProcess(process: .init(duracaoProcesso: 10, tamanhoProcesso: 20, tempoCriacao: 20))
+                c.addProcess(process: .init(duracaoProcesso: 10, tamanhoProcesso: 20, tempoCriacao: 10))
                 
-                c.addProcess(process: .init(duracaoProcesso: 20, tamanhoProcesso: 5, tempoCriacao: 25))
+                c.addProcess(process: .init(duracaoProcesso: 20, tamanhoProcesso: 5, tempoCriacao: 10))
                 
-                c.addProcess(process: .init(duracaoProcesso: 30, tamanhoProcesso: 2, tempoCriacao: 100))
+                c.addProcess(process: .init(duracaoProcesso: 30, tamanhoProcesso: 20, tempoCriacao: 10))
             
                 
             } label: {
@@ -145,6 +145,7 @@ struct ContentView: View {
 //        })
         .onReceive(c.processesFinalizados.publisher, perform: { _ in
             showingAlert = c.processesEntrou.count == c.processesFinalizados.count
+            self.ram.viewModel.objectWillChange.send()
             
         }).alert("TempoMedio = \(calculateTempoMedio())s", isPresented: $showingAlert) {
             Button("OK", role: .cancel) {

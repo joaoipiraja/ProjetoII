@@ -37,8 +37,17 @@ class Controladora: ObservableObject{
         
         self.processesEntrou.append(process)
         
-
-        DispatchQueue.main.asyncAfter(deadline: .now() +         DispatchTimeInterval.seconds(process.tempoCriacaoSeconds)) {
+        var soma = processesEntrou.map { p in
+            if(p.id != process.id){
+                return p.tempoCriacaoSeconds
+            }else{
+                return 0
+            }
+        }.reduce(0) {$0 + $1}
+        
+        print(soma)
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() +         DispatchTimeInterval.seconds(process.tempoCriacaoSeconds + soma)) {
             
             process.tempoCriacao = Date()
             NotificationCenter.default.post(name: self.notificationEspera.name, object: process)
