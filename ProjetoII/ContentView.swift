@@ -58,15 +58,21 @@ struct ContentView: View {
         self.ram.viewModel.memoriaTotal = self.sheetViewModel.tamanhoMemoria
         self.ram.viewModel.memoria = self.sheetViewModel.tamanhoMemoria - self.sheetViewModel.tamanhoMemoriaSistemaOperacional
         
+        let so = MemoriaRAMModel(tipo: .so, posicaoInicio: 0, posicaoFim: self.sheetViewModel.tamanhoMemoriaSistemaOperacional)
+        
+        let buraco = MemoriaRAMModel(tipo: .buraco, posicaoInicio: so.posicaoFim! + 1, posicaoFim: (so.posicaoFim! + 1) + (self.ram.viewModel.memoriaTotal - self.sheetViewModel.tamanhoMemoriaSistemaOperacional) )
+        
+        self.ram.viewModel.processosEmExecucao.append(so)
+        self.ram.viewModel.processosEmExecucao.append(buraco)
 
-        self.ram.viewModel.processosEmExecucao.append(.init(tipo: .so, posicaoInicio: 0, posicaoFim: self.sheetViewModel.tamanhoMemoriaSistemaOperacional))
-        
-        
-        self.ram.viewModel.processosEmExecucao.append(.init(tipo: .buraco, posicaoInicio: self.sheetViewModel.tamanhoMemoriaSistemaOperacional+1, posicaoFim:self.ram.viewModel.memoria + 1))
         
         print(self.sheetViewModel.tamanhoMemoria)
         
-        self.ram.viewModel.objectWillChange.send()
+
+        DispatchQueue.main.async {
+            self.ram.objectWillChange.send()
+        }
+        
     }
 
     var body: some View {
@@ -187,6 +193,10 @@ struct ContentView: View {
             //
             //        })
         .onReceive(c.viewModel.processesFinalizados.publisher, perform: { _ in
+            
+                DispatchQueue.main.async {
+                    self.ram.viewModel.objectWillChange.send()
+                }
             
                 showingAlert = c.viewModel.isFinished
                         
