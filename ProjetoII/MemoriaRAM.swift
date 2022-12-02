@@ -111,37 +111,75 @@ class MemoriaRAM: ObservableObject{
         
         let index_lista = self.viewModel.processosEmExecucao.enumerated().map { (index,rams) in
             if(rams.tipo == .buraco){
-                return index
+                return (index, rams.sizeOf)
             }else{
-                return -1
+                return (-1, rams.sizeOf)
             }
-        }.filter{$0 > 0}
-        
-        let reducedInto = index_lista.reduce(into: [[Int]]()) { (result, next) in
-            //Retrieve the last sequence, check if the current - last item of sequence is 1
-            if var lastSequence = result.last, let last = lastSequence.last, next-last == 1 {
-                lastSequence.append(next)
-                result[result.endIndex-1] = lastSequence
-            } else { //It's not => New array of its own
-                result.append([next])
-            }
+        }.filter { (index,size) in
+            return index > 0 && size > 0
         }
         
-        print(reducedInto)
         
+        
+       
+        let reducedInto = index_lista.reduce(into: Array<[(Int,Int)]>(), { result, next in
+         
+            
+            if var lastSequence = result.last, let last = lastSequence.last?.0, next.0 - last == 1{
+                lastSequence.append(next)
+                result[result.count - 1] = lastSequence
+            }else{
+                result.append([next])
+            }
+        })
+            
+
+       
+                
         for interval in reducedInto{
             print(interval)
             if(interval.count > 2){
-                print("interval.count > 2")
-                let indexFirst = interval.first!
-                let indexLast = interval.last!
+                
+                let indexFirst = interval.first?.0 ?? 0
+                let indexLast = interval.last?.0 ?? 0
+                
+                let sumOfSizes = interval.reduce(into: 0) {$0 + $1.1}
+                
+    
+                
                 let ram = MemoriaRAMModel(tipo: .buraco,
                                           posicaoInicio: self.viewModel.processosEmExecucao[indexFirst].posicaoInicio ,
-                                          posicaoFim: self.viewModel.processosEmExecucao[indexLast].posicaoFim! - (indexLast - indexFirst))
+                                          posicaoFim: self.viewModel.processosEmExecucao[indexFirst].posicaoInicio! + sumOfSizes)
                 if(indexLast > indexFirst){
                     self.viewModel.processosEmExecucao[indexFirst] = ram
                     self.viewModel.processosEmExecucao.removeSubrange(indexFirst+1...indexLast)
+                    
+                    if(indexFirst + 1 < self.viewModel.processosEmExecucao.count - 1){
+                        for i in indexFirst...self.viewModel.processosEmExecucao.count-1{
+                            
+                            let posicaoFinal = self.viewModel.processosEmExecucao[i].posicaoFim!
+                            
+                            let t =  self.viewModel.processosEmExecucao[i].sizeOf
+                            
+                            var new = self.viewModel.processosEmExecucao[i+1]
+                            new.posicaoInicio = posicaoFinal + 1
+                            new.posicaoFim = new.posicaoInicio! + t
+                            
+                        
+                            if(new.sizeOf <= self.viewModel.memoria){
+                                self.viewModel.processosEmExecucao[i+1] = new
+                            }
+                            
+                            
+                            
+                        }
+                    }
+                 
+                    
+                    
                 }
+                
+                
             }
         }
         
@@ -222,15 +260,15 @@ class MemoriaRAM: ObservableObject{
       
                     
                         var aux = self.viewModel.processosEmExecucao[index]
-                    
+                        
+                        let sizeOfHole = aux.sizeOf //20
                 
                         ram.posicaoInicio = aux.posicaoInicio //100
                         ram.posicaoFim =  aux.posicaoInicio! + processo.tamanhoProcesso //101
                     
                         aux.posicaoInicio = ram.posicaoFim! + 1 //102
-                        aux.posicaoFim =  aux.posicaoFim! + 1
-                        
-                    
+                        aux.posicaoFim =  aux.posicaoInicio! + (sizeOfHole-processo.tamanhoProcesso)
+                
                     if(aux.posicaoFim! > aux.posicaoInicio!){
                         
                         
@@ -244,34 +282,8 @@ class MemoriaRAM: ObservableObject{
                         
                         
                         
-                        let newInterval = self.viewModel.processosEmExecucao.enumerated().filter({ (i, _) in
-                            return i > index + 1
-                        }).reduce(Array<MemoriaRAMModel>()) { (partialResult, trupla) in
-                            
-                            var partialResultVar = partialResult
-                            let aux_map =  self.viewModel.processosEmExecucao[trupla.offset]
-
-                            aux_map.posicaoInicio! = self.viewModel.processosEmExecucao[trupla.offset-1].posicaoFim! + 1
-                        
-                            aux_map.posicaoFim! += 1
-                            
-                            if(aux_map.posicaoFim! > aux_map.posicaoInicio!){
-                                partialResultVar.append(aux_map)
-                            }
-                            
-                            return partialResultVar
-
-                        }
-                        
-                        if !newInterval.isEmpty{
-                            
-                            self.viewModel.processosEmExecucao.removeSubrange(index+1...self.viewModel.processosEmExecucao.count-1)
-                            self.viewModel.processosEmExecucao += newInterval
-
-                        }
-                        
                     }else{
-                        
+                        self.viewModel.processosEmExecucao[index] = ram
                     }
 
     
@@ -282,7 +294,7 @@ class MemoriaRAM: ObservableObject{
             }
         
 
-        
+        self.viewModel.objectWillChange.send()
 
        
     }
