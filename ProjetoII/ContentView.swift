@@ -56,6 +56,7 @@ struct ContentView: View {
         self.ram.viewModel.estrategiaAlocacao = self.sheetViewModel.alocacao
         
         self.ram.viewModel.memoriaTotal = self.sheetViewModel.tamanhoMemoria
+        
         self.ram.viewModel.memoria = self.sheetViewModel.tamanhoMemoria - self.sheetViewModel.tamanhoMemoriaSistemaOperacional
         
         let so = MemoriaRAMModel(tipo: .so, posicaoInicio: 0, posicaoFim: self.sheetViewModel.tamanhoMemoriaSistemaOperacional)

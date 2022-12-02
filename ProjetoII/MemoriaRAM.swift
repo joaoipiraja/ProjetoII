@@ -107,87 +107,55 @@ class MemoriaRAM: ObservableObject{
     
     
     func mergeBuracos(){
-        
-        self.viewModel.processosEmExecucao =  self.viewModel.processosEmExecucao.sorted { $0.posicaoInicio! < $1.posicaoInicio!}
-        
-        let index_lista = self.viewModel.processosEmExecucao.enumerated().map { (index,rams) in
-            if(rams.tipo == .buraco){
-                return (index, rams.sizeOf)
-            }else{
-                return (-1, rams.sizeOf)
-            }
-        }.filter { (index,size) in
-            return index > 0 && size > 0
-        }
-        
-        
-        
-       
-        let reducedInto = index_lista.reduce(into: Array<[(Int,Int)]>(), { result, next in
-         
             
-            if var lastSequence = result.last, let last = lastSequence.last?.0, next.0 - last == 1{
-                lastSequence.append(next)
-                result[result.count - 1] = lastSequence
-            }else{
-                result.append([next])
-            }
-        })
+                self.viewModel.processosEmExecucao =  self.viewModel.processosEmExecucao.sorted { $0.posicaoInicio! < $1.posicaoInicio!}
             
 
-       
+                let ram = MemoriaRAMModel(tipo: .buraco)
+            
+             
                 
-        for interval in reducedInto{
-            print(interval)
-            if(interval.count > 2){
-                
-                let indexFirst = interval.first?.0 ?? 0
-                let indexLast = interval.last?.0 ?? 0
-                
-                let sumOfSizes = interval.reduce(into: 0) {$0 + $1.1}
-                
-    
-                
-                let ram = MemoriaRAMModel(tipo: .buraco,
-                                          posicaoInicio: self.viewModel.processosEmExecucao[indexFirst].posicaoInicio ,
-                                          posicaoFim: self.viewModel.processosEmExecucao[indexFirst].posicaoInicio! + sumOfSizes)
-                if(indexLast > indexFirst){
-                    self.viewModel.processosEmExecucao[indexFirst] = ram
-                    self.viewModel.processosEmExecucao.removeSubrange(indexFirst+1...indexLast)
+                if let index = try? self.viewModel.processosEmExecucao.firstIndex(where: {$0.tipo == .buraco}){
                     
-                    if(indexFirst + 1 < self.viewModel.processosEmExecucao.count - 1){
-                        for i in indexFirst...self.viewModel.processosEmExecucao.count-1{
-                            
-                            let posicaoFinal = self.viewModel.processosEmExecucao[i].posicaoFim!
-                            
-                            let t =  self.viewModel.processosEmExecucao[i].sizeOf
-                            
-                            var new = self.viewModel.processosEmExecucao[i+1]
-                            new.posicaoInicio = posicaoFinal + 1
-                            new.posicaoFim = new.posicaoInicio! + t
-                            
+                    ram.posicaoInicio = self.viewModel.processosEmExecucao[index].posicaoInicio
+                    
+                    var cont = 1
+                    var index_final = -1
                         
-                            if(new.sizeOf <= self.viewModel.memoria){
-                                self.viewModel.processosEmExecucao[i+1] = new
-                            }
+                        for i in index+1..<self.viewModel.processosEmExecucao.count{
                             
-                            
-                            
-                        }
-                    }
-                 
-                    
-                    
-                }
-                
-                
-            }
-        }
-        
-    
+                            switch self.viewModel.processosEmExecucao[i].tipo{
+                                
+                                case .so:
+                                    break
+                                case .processo(processo: _):
+                                    break
+                                case .buraco:
+                                    if(i == index+1){
+                                        ram.posicaoFim = self.viewModel.processosEmExecucao[i].posicaoFim!
 
-        
-    }
+                                    }else{
+                                        ram.posicaoFim = self.viewModel.processosEmExecucao[i].posicaoFim!
+                                    }
+                                    index_final = i
+                                    break
+                                
+                            }
+
+                        }
+                    
+                    if index_final >= 0 {
+                        self.viewModel.processosEmExecucao[index] = ram
+                        self.viewModel.processosEmExecucao.removeSubrange(index+1...index_final)
+                    }
+
+                }
+            
+                self.viewModel.objectWillChange.send()
+            
+               
+            
+        }
     
     func sizeOfCurrentProcess() -> Int{
         
@@ -220,33 +188,35 @@ class MemoriaRAM: ObservableObject{
     }
     
     func enqueue(){
-  
-        if(self.viewModel.memoriaAlocada + sizeOfCurrentProcess() < (self.viewModel.memoria)){
-                        //executa o algoritmo
-                        if let fila = self.filaEspera.dequeue(){
-                            
-                            
-                            switch fila.tipo{
-                                
-                            case .so:
-                                break
-                            case .processo(processo: let p):
+   
+        if(self.viewModel.memoriaAlocada + sumOfProcessesSizes() <= self.viewModel.memoria){
+                         //executa o algoritmo
+            if let fila = self.filaEspera.dequeue(){
+                             
+                             
+                             switch fila.tipo{
+                                 
+                             case .so:
+                                 break
+                             case .processo(processo: let p):
 
-                                NotificationCenter.default.post(name: self.notificationRodando.name, object: p)
-                                    addProcess(ram: fila)
-                                    self.viewModel.memoriaAlocada = sumOfProcessesSizes()
-                            case .buraco:
-                                break
-                            }
-                        }
-                }
-        
+                                 NotificationCenter.default.post(name: self.notificationRodando.name, object: p)
+                                 addProcess(ram: fila)
+                                 self.viewModel.memoriaAlocada += p.tamanhoProcesso
 
-    }
+                             case .buraco:
+                                 break
+                             }
+                         }
+                 }
+         
+         self.viewModel.objectWillChange.send()
+
+     }
     
     func addProcess(ram: MemoriaRAMModel){
         
-
+        
                 
         if let index = findRole(alg:  self.viewModel.estrategiaAlocacao){
                 
@@ -257,37 +227,29 @@ class MemoriaRAM: ObservableObject{
                         break
                     case .processo(processo: let processo):
                     
-                    
-      
+                        //Se basea no tamanaho e particiona
+                        //Particiona
                     
                         var aux = self.viewModel.processosEmExecucao[index]
-                        
-                        let sizeOfHole = aux.sizeOf //20
+
                 
-                        ram.posicaoInicio = aux.posicaoInicio //100
-                        ram.posicaoFim =  aux.posicaoInicio! + processo.tamanhoProcesso //101
+                        ram.posicaoInicio = aux.posicaoInicio
+                        ram.posicaoFim =  aux.posicaoInicio! + processo.tamanhoProcesso
                     
-                        aux.posicaoInicio = ram.posicaoFim! + 1 //102
-                        aux.posicaoFim =  aux.posicaoInicio! + (sizeOfHole-processo.tamanhoProcesso)
-                
-                    if(aux.posicaoFim! > aux.posicaoInicio!){
-                        
-                        
-                        if(index+1 > self.viewModel.processosEmExecucao.count){
+                    if((ram.posicaoFim! -  ram.posicaoInicio!) >= (self.viewModel.memoria - self.viewModel.memoriaAlocada) && (ram.posicaoFim! -  ram.posicaoInicio!) > 0){
                             self.viewModel.processosEmExecucao[index] = ram
-                            self.viewModel.processosEmExecucao[index+1] = aux
                         }else{
-                            self.viewModel.processosEmExecucao[index] = ram
-                            self.viewModel.processosEmExecucao.append(aux)
+                            aux.posicaoInicio = ram.posicaoFim! + 1
+
+                            if(index+1 > self.viewModel.processosEmExecucao.count){
+                                self.viewModel.processosEmExecucao[index] = ram
+                                self.viewModel.processosEmExecucao[index+1] = aux
+                            }else{
+                                self.viewModel.processosEmExecucao[index] = ram
+                                self.viewModel.processosEmExecucao.append(aux)
+                            }
+                            
                         }
-                        
-                        
-    
-
-                    }else{
-                        self.viewModel.processosEmExecucao[index] = ram
-
-                    }
 
     
                     case .buraco:
@@ -296,8 +258,11 @@ class MemoriaRAM: ObservableObject{
                 
             }
         
-
+        self.viewModel.processosEmExecucao =  self.viewModel.processosEmExecucao.sorted { $0.posicaoInicio! < $1.posicaoInicio!}
+        
         self.viewModel.objectWillChange.send()
+
+        
 
        
     }
