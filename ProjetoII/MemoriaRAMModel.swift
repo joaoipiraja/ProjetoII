@@ -37,15 +37,24 @@ class MemoriaRAMModel: ObservableObject, Identifiable{
     }
     
     let id = UUID()
+    
     @Published var posicaoInicio:Int?
     @Published var posicaoFim:Int?
+    
     var tipo: Tipo
+    
+    var sizeOf: Int{
+        get{
+            return (posicaoFim ?? 0) - (posicaoInicio ?? 0)
+        }
+    }
     
     init(tipo: Tipo, posicaoInicio: Int? = nil, posicaoFim: Int? = nil){
         self.tipo = tipo
         self.posicaoInicio = posicaoInicio
         self.posicaoFim = posicaoFim
     }
+    
     static var MOCK = MemoriaRAMModel(tipo: .buraco, posicaoInicio: 0, posicaoFim: 1)
     
 }

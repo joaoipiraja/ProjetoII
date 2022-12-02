@@ -21,6 +21,7 @@
 		4E3A02B52925557A0075D0E1 /* ProjetoIITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E3A02B42925557A0075D0E1 /* ProjetoIITests.swift */; };
 		4E3A02BF2925557A0075D0E1 /* ProjetoIIUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E3A02BE2925557A0075D0E1 /* ProjetoIIUITests.swift */; };
 		4E3A02C12925557A0075D0E1 /* ProjetoIIUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E3A02C02925557A0075D0E1 /* ProjetoIIUITestsLaunchTests.swift */; };
+		4E4EBB41293916F60015DE4C /* Sheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E4EBB40293916F60015DE4C /* Sheet.swift */; };
 		4E8097A6293256E400B6F5CB /* Card.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E8097A5293256E400B6F5CB /* Card.swift */; };
 /* End PBXBuildFile section */
 
@@ -59,6 +60,7 @@
 		4E3A02BA2925557A0075D0E1 /* ProjetoIIUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ProjetoIIUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		4E3A02BE2925557A0075D0E1 /* ProjetoIIUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProjetoIIUITests.swift; sourceTree = "<group>"; };
 		4E3A02C02925557A0075D0E1 /* ProjetoIIUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProjetoIIUITestsLaunchTests.swift; sourceTree = "<group>"; };
+		4E4EBB40293916F60015DE4C /* Sheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sheet.swift; sourceTree = "<group>"; };
 		4E8097A5293256E400B6F5CB /* Card.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Card.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -122,6 +124,7 @@
 				4E1BAFEB292D033200B1ACB5 /* MemoriaRAM.swift */,
 				4E3A02A72925557A0075D0E1 /* Assets.xcassets */,
 				4E3A02A92925557A0075D0E1 /* Preview Content */,
+				4E4EBB40293916F60015DE4C /* Sheet.swift */,
 			);
 			path = ProjetoII;
 			sourceTree = "<group>";
@@ -287,6 +290,7 @@
 				4E1BAFE8292D02EA00B1ACB5 /* Notify.swift in Sources */,
 				4E1BAFE2292D029700B1ACB5 /* Queue.swift in Sources */,
 				4E1BAFEE292D035200B1ACB5 /* Controladora.swift in Sources */,
+				4E4EBB41293916F60015DE4C /* Sheet.swift in Sources */,
 				4E1BAFEC292D033200B1ACB5 /* MemoriaRAM.swift in Sources */,
 				4E8097A6293256E400B6F5CB /* Card.swift in Sources */,
 				4E3A02A4292555790075D0E1 /* ProjetoIIApp.swift in Sources */,

@@ -7,10 +7,35 @@
 
 import Foundation
 import Combine
+import SwiftUI
+
+
+
 
 class Controladora: ObservableObject{
  
-    
+    class ViewModel: ObservableObject{
+        @Published var processesFinalizados = Array<Process>()
+        @Published var processesEntrou = Array<Process>()
+        
+        var isFinished: Bool{
+            get{
+                return self.processesFinalizados.count == self.processesEntrou.count
+            }
+        }
+        var processesNotExec: Array<Process> {
+            get{
+                return self.processesEntrou.filter{$0.tempoCriacao == nil}
+            }
+        }
+        
+        
+        
+        func calculateTempoMedio() -> Double{
+            let soma = self.processesFinalizados.filter{ $0.isFinished}.reduce(0.0) { $0 + ($1.tempoAtual! - $1.tempoCriacao!)}
+            return soma/Double(self.processesFinalizados.count)
+        }
+    }
     
     //Recebe tanto quem espera, quanto finaliza
     
@@ -20,24 +45,11 @@ class Controladora: ObservableObject{
     
     var cancellables = Set<AnyCancellable>()
     
-    @Published var processesFinalizados = Array<Process>()
-    @Published var processesEntrou = Array<Process>()
-
+    @Published var viewModel: ViewModel = .init()
     
 
-    
-//
-//    func updateProcess(processo: Process){
-//            if let index = try? self.processes.firstIndex(where: {$0.id == processo.id}) {
-//                self.processes[index] = processo
-//            }
-//
-//    }
-    func addProcess(process: Process){
-        
-        self.processesEntrou.append(process)
-        
-        var soma = processesEntrou.map { p in
+    func calculateWatingTime(process: Process) -> DispatchTimeInterval{
+        let secondsSum = self.viewModel.processesEntrou.map { p in
             if(p.id != process.id){
                 return p.tempoCriacaoSeconds
             }else{
@@ -45,18 +57,19 @@ class Controladora: ObservableObject{
             }
         }.reduce(0) {$0 + $1}
         
-        print(soma)
+        return DispatchTimeInterval.seconds(process.tempoCriacaoSeconds + secondsSum)
+    }
+    func addProcess(process: Process){
         
-        DispatchQueue.main.asyncAfter(deadline: .now() +         DispatchTimeInterval.seconds(process.tempoCriacaoSeconds + soma)) {
+        self.viewModel.processesEntrou.append(process)
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() +  calculateWatingTime(process: process)) {
             
             process.tempoCriacao = Date()
             NotificationCenter.default.post(name: self.notificationEspera.name, object: process)
 
         }
-        
-
-        
-        
+  
     }
     
     
@@ -76,10 +89,9 @@ class Controladora: ObservableObject{
                 if(process.isFinished){
                     // foi finalizado
                     
-                    processesFinalizados.append(process)
+                    self.viewModel.processesFinalizados.append(process)
                     
                 }else{
-                    
                     let ram = MemoriaRAMModel(tipo: .processo(processo: process))
                     NotificationCenter.default.post(name:Notification.Name("rodando"), object: ram)
                     
