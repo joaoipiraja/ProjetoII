@@ -41,7 +41,7 @@ class Controladora: ObservableObject{
     
     var notificationEspera:Notify
     var notificationFinalizou:Notify
-
+    var notificationRodando:Notify
     
     var cancellables = Set<AnyCancellable>()
     
@@ -74,10 +74,11 @@ class Controladora: ObservableObject{
     
     
     
-    init(nf: Notify, ne: Notify){
+    init(nf: Notify, ne: Notify, nr:Notify){
 
             self.notificationEspera = ne
             self.notificationFinalizou = nf
+            self.notificationRodando = nr
         
             self.notificationEspera.publisher
             .merge(with: self.notificationFinalizou.publisher)
@@ -93,7 +94,7 @@ class Controladora: ObservableObject{
                     
                 }else{
                     let ram = MemoriaRAMModel(tipo: .processo(processo: process))
-                    NotificationCenter.default.post(name:Notification.Name("rodando"), object: ram)
+                    NotificationCenter.default.post(name: nr.name, object: ram)
                     
                     //self.queue.enqueue(process)
 

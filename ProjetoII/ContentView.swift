@@ -36,7 +36,8 @@ struct ContentView: View {
         self.ne.register()
         
         ram = .init(nr: nr, nf: nf)
-        c = .init(nf: nf, ne: ne)
+        c = .init(nf: nf, ne: ne, nr: nr)
+        
     }
     
     func generateProcesses(){
@@ -47,7 +48,6 @@ struct ContentView: View {
             let randomTamanho = self.sheetViewModel.intervaloTamanhoProcesso.range.randomElement()!
             
             c.addProcess(process: .init(duracaoProcesso: randomDuracao, tamanhoProcesso: randomTamanho, tempoCriacao: randomTempoCriacao))
-            c.objectWillChange.send()
         }
     }
     
@@ -66,7 +66,7 @@ struct ContentView: View {
         
         print(self.sheetViewModel.tamanhoMemoria)
         
-        self.ram.objectWillChange.send()
+        self.ram.viewModel.objectWillChange.send()
     }
 
     var body: some View {
@@ -123,7 +123,7 @@ struct ContentView: View {
                         Text("Memoria - \(self.ram.viewModel.memoriaAlocada)/\( self.ram.viewModel.memoriaTotal)MB")
                         
                         HStack{
-                            ForEach(ram.viewModel.processosEmExecucao, id: \.id) { ram in
+                            ForEach( self.ram.viewModel.processosEmExecucao, id: \.id) { ram in
                                 Card(ram: ram)
                             }
                         }

@@ -44,9 +44,10 @@ class MemoriaRAM: ObservableObject{
     var notificationFinalizou: Notify
     
     
+    
     func findRole(alg: EstrategiaAlocacao) -> Int?{
           
-          var distance = self.viewModel.processosEmExecucao.enumerated()
+        var distance = self.viewModel.processosEmExecucao.enumerated()
 
               .map { (index,ram) in
               switch ram.tipo{
@@ -71,7 +72,7 @@ class MemoriaRAM: ObservableObject{
               case .bestFit:
                   return min?.0
               case .firstFit:
-                  return try? self.viewModel.processosEmExecucao.firstIndex(where: {$0.tipo == .buraco})
+              return try? self.viewModel.processosEmExecucao.firstIndex(where: {$0.tipo == .buraco})
               case .worstFit:
                   return max?.0
           }
@@ -79,7 +80,7 @@ class MemoriaRAM: ObservableObject{
     
     
     func index(processo: Process) -> Int?{
-        return try? self.viewModel.processosEmExecucao.firstIndex(where: { ram in
+        return try?self.viewModel.processosEmExecucao.lastIndex(where: { ram in
             
             switch ram.tipo{
             case .so:
@@ -87,7 +88,7 @@ class MemoriaRAM: ObservableObject{
             case .processo(processo: let p):
                 return p.id == processo.id
             case .buraco:
-                return false
+                return true
 
             }
         })
@@ -95,13 +96,13 @@ class MemoriaRAM: ObservableObject{
 
     
     func removeProcess(processo: Process){
-        
+            
             if let index = self.index(processo: processo){
                 self.viewModel.processosEmExecucao[index].tipo = .buraco
-                self.viewModel.objectWillChange.send()
+                self.objectWillChange.send()
+                self.mergeBuracos()
             }
         
-            self.mergeBuracos()
     }
     
     
@@ -182,7 +183,7 @@ class MemoriaRAM: ObservableObject{
     
     func enqueue(){
   
-        if(self.viewModel.memoriaAlocada + sizeOfCurrentProcess() < self.viewModel.memoria){
+        if(self.viewModel.memoriaAlocada + sizeOfCurrentProcess() < (self.viewModel.memoria)){
                         //executa o algoritmo
                         if let fila = self.filaEspera.dequeue(){
                             
@@ -244,34 +245,34 @@ class MemoriaRAM: ObservableObject{
                         
                         
                         
-                        let newInterval = self.viewModel.processosEmExecucao.enumerated().filter({ (i, _) in
-                            return i > index + 1
-                        }).reduce(Array<MemoriaRAMModel>()) { (partialResult, trupla) in
-                            
-                            var partialResultVar = partialResult
-                            let aux_map =  self.viewModel.processosEmExecucao[trupla.offset]
-
-                            aux_map.posicaoInicio! = self.viewModel.processosEmExecucao[trupla.offset-1].posicaoFim! + 1
-                        
-                            aux_map.posicaoFim! += 1
-                            
-                            if(aux_map.posicaoFim! > aux_map.posicaoInicio!){
-                                partialResultVar.append(aux_map)
-                            }
-                            
-                            return partialResultVar
-
-                        }
-                        
-                        if !newInterval.isEmpty{
-                            
-                            self.viewModel.processosEmExecucao.removeSubrange(index+1...self.viewModel.processosEmExecucao.count-1)
-                            self.viewModel.processosEmExecucao += newInterval
-
-                        }
+//                        let newInterval = self.viewModel.processosEmExecucao.enumerated().filter({ (i, _) in
+//                            return i > index + 1
+//                        }).reduce(Array<MemoriaRAMModel>()) { (partialResult, trupla) in
+//
+//                            var partialResultVar = partialResult
+//                            let aux_map =  self.viewModel.processosEmExecucao[trupla.offset]
+//
+//                            aux_map.posicaoInicio! = self.viewModel.processosEmExecucao[trupla.offset-1].posicaoFim! + 1
+//
+//                            aux_map.posicaoFim! += 1
+//
+//                            if(aux_map.posicaoFim! > aux_map.posicaoInicio!){
+//                                partialResultVar.append(aux_map)
+//                            }
+//
+//                            return partialResultVar
+//
+//                        }
+//
+//                        if !newInterval.isEmpty{
+//
+//                            self.viewModel.processosEmExecucao.removeSubrange(index+1...self.viewModel.processosEmExecucao.count-1)
+//                            self.viewModel.processosEmExecucao += newInterval
+//
+//                        }
                         
                     }else{
-                        
+                        self.viewModel.processosEmExecucao[index] = ram
                     }
 
     
@@ -293,7 +294,6 @@ class MemoriaRAM: ObservableObject{
         
         self.notificationRodando = nr
         self.notificationFinalizou = nf
-
         
         self.cancellable =
             self.notificationRodando.publisher
@@ -317,17 +317,16 @@ class MemoriaRAM: ObservableObject{
                         
                             processM.isFinished = true
 
-                            self.removeProcess(processo: process)
+                            self.removeProcess(processo: processM)
                             self.viewModel.memoriaAlocada = self.sumOfProcessesSizes()
                             NotificationCenter.default.post(name: self.notificationFinalizou.name, object: processM)
 
                             
                         }else{
-                            print(processM)
                             NotificationCenter.default.post(name: self.notificationRodando.name, object: processM)
-
+                            enqueue()
                         }
-                    enqueue()
+                    
 
 
 

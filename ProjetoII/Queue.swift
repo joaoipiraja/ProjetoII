@@ -9,13 +9,13 @@ import Foundation
 
 struct Queue<T: AnyObject> {
     
-      var elements: [T] = []
+        var elements: [T] = []
 
-      mutating func enqueue(_ value: T) {
-        elements.append(value)
-      }
+        mutating func enqueue(_ value: T) {
+            elements.append(value)
+        }
 
-      mutating func dequeue() -> T? {
+        mutating func dequeue() -> T? {
         guard !elements.isEmpty else {
           return nil
         }
