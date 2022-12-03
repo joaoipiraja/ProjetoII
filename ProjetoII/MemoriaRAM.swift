@@ -10,10 +10,14 @@ import Combine
 import SwiftUI
 
 
-enum EstrategiaAlocacao{
-  case bestFit
-  case firstFit
-  case worstFit
+enum EstrategiaAlocacao:String, CaseIterable{
+    
+  case bestFit = "Best Fit"
+  case firstFit = "First Fit"
+  case worstFit = "Worst Fit"
+    
+  var localizedName: LocalizedStringKey { LocalizedStringKey(rawValue) }
+
 }
 
 
@@ -33,9 +37,10 @@ class MemoriaRAM: ObservableObject{
     
     var notificationRodando: Notify
     var notificationFinalizou: Notify
-    var estrategiaAlocacao: EstrategiaAlocacao
+    var estrategiaAlocacao: EstrategiaAlocacao = .firstFit
     
-    var memoria: Int
+    var memoria: Int = 0
+    var memoriaTotal: Int = 0
     @Published var memoriaAlocada = 0
     
     
@@ -100,48 +105,19 @@ class MemoriaRAM: ObservableObject{
     
     func mergeBuracos(){
         
-            self.viewModel.rams =  self.viewModel.rams.sorted { $0.posicaoInicio! < $1.posicaoInicio!}
-        
-
-            let ram = MemoriaRAMModel(tipo: .buraco)
-        
-         
-            
-            if let index = try? self.viewModel.rams.firstIndex(where: {$0.tipo == .buraco}){
+        if let indexFirst = try? viewModel.rams.firstIndex(where: { $0.tipo == .buraco}){
+            if let indexLast = try? viewModel.rams.lastIndex(where: { $0.tipo == .buraco}){
+                let ram = MemoriaRAMModel(tipo: .buraco, posicaoInicio: self.viewModel.rams[indexFirst].posicaoInicio, posicaoFim: self.viewModel.rams[indexLast].posicaoFim! - (indexLast-indexFirst))
+               
                 
-                ram.posicaoInicio = self.viewModel.rams[index].posicaoInicio
-                
-                var cont = 1
-                var index_final = -1
+                if(indexLast > indexFirst){
+                    self.viewModel.rams[indexFirst] = ram
+                    self.viewModel.rams.removeSubrange(indexFirst+1...indexLast)
                     
-                    for i in index+1..<self.viewModel.rams.count{
-                        
-                        switch self.viewModel.rams[i].tipo{
-                            
-                            case .so:
-                                break
-                            case .processo(processo: _):
-                                break
-                            case .buraco:
-                                if(i == index+1){
-                                    ram.posicaoFim = self.viewModel.rams[i].posicaoFim!
-
-                                }else{
-                                    ram.posicaoFim = self.viewModel.rams[i].posicaoFim!
-                                }
-                                index_final = i
-                                break
-                            
-                        }
-
-                    }
-                
-                if index_final >= 0 {
-                    self.viewModel.rams[index] = ram
-                    self.viewModel.rams.removeSubrange(index+1...index_final)
+                    
                 }
-
             }
+        }
         
             self.viewModel.objectWillChange.send()
         
@@ -211,7 +187,8 @@ class MemoriaRAM: ObservableObject{
                             self.viewModel.rams[index] = ram
                         }else{
                             aux.posicaoInicio = ram.posicaoFim! + 1
-
+                            aux.posicaoFim! += 1
+                            
                             if(index+1 > self.viewModel.rams.count){
                                 self.viewModel.rams[index] = ram
                                 self.viewModel.rams[index+1] = aux
@@ -229,7 +206,7 @@ class MemoriaRAM: ObservableObject{
                 
             }
         
-        self.viewModel.rams =  self.viewModel.rams.sorted { $0.posicaoInicio! < $1.posicaoInicio!}
+       
         
         self.viewModel.objectWillChange.send()
 
@@ -240,19 +217,12 @@ class MemoriaRAM: ObservableObject{
     
   
     
-    init( nr: Notify, nf: Notify, memoriaSize:Int, so: MemoriaRAMModel, alocacao: EstrategiaAlocacao){
+    init( nr: Notify, nf: Notify){
         
         self.notificationRodando = nr
         self.notificationFinalizou = nf
         
-        let buraco = MemoriaRAMModel(tipo: .buraco, posicaoInicio: so.posicaoFim!+1, posicaoFim: so.posicaoFim!+1+memoriaSize)
-        
-        self.memoria = memoriaSize
-        self.estrategiaAlocacao = alocacao
-        
-        self.viewModel.rams.append(so)
-        self.viewModel.rams.append(buraco)
-        
+     
         self.cancellable =
             self.notificationRodando.publisher
             .zip(timer)
@@ -286,7 +256,8 @@ class MemoriaRAM: ObservableObject{
 
                 }
 
-                
+                self.viewModel.rams =  self.viewModel.rams.sorted { $0.posicaoInicio! < $1.posicaoInicio!}
+              
         }
     }
 }
