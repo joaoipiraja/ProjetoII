@@ -141,7 +141,7 @@ struct ContentView: View {
                     }
                 }
             }header: {
-                Text("Memoria - \(ram.memoriaAlocada)/\(ram.memoria) MB")
+                Text("Memoria - \(ram.memoriaAlocada+self.sheetViewModel.tamanhoMemoriaSistemaOperacional)/\(ram.memoriaTotal) MB")
             }
            
              
@@ -203,6 +203,11 @@ struct ContentView: View {
             }
         }.sheet(isPresented: $showingSheet, onDismiss: {
             c.processesFinalizados = []
+            self.ram.viewModel.rams = []
+            self.c.processesEntrou = []
+            self.c.processesFinalizados = []
+            self.progress = 0.0
+            
             generateInitialState()
             generateProcesses()
             
