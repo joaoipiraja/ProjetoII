@@ -28,7 +28,7 @@ class ViewModel: ObservableObject{
 
 class MemoriaRAM: ObservableObject{
     
-    var cancellable: Cancellable?
+    var cancellables = Set<AnyCancellable>()
     var timer = Timer.publish(every: 1, on: .current, in: .default).autoconnect()
     
     @Published var queue: Queue<MemoriaRAMModel> = .init()
@@ -215,49 +215,54 @@ class MemoriaRAM: ObservableObject{
        
     }
     
-  
     
-    init( nr: Notify, nf: Notify){
+    func listenToNotications(){
         
-        self.notificationRodando = nr
-        self.notificationFinalizou = nf
-        
-     
-        self.cancellable =
-            self.notificationRodando.publisher
+        self.cancellables.removeAll()
+        self.notificationRodando.publisher
             .zip(timer)
             .sink { [unowned self] (notification,timer) in
                 
                 
                 if let ram = notification.object as? MemoriaRAMModel{
                     
-                   
-
+                    
+                    
                     //addProcess(ram: ram)
                     self.queue.enqueue(ram)
                     enqueue()
-           
-
+                    
+                    
                 }else if let process = notification.object as? Process{
-                
-
-                        var processM = process
-                        
-                        if processM.addTime(tempo: timer){
-                            self.removeProcess(processo: process)
-                            processM.isFinished = true
-                            memoriaAlocada -= process.tamanhoProcesso
-                            NotificationCenter.default.post(name: self.notificationFinalizou.name, object: processM)
-                        }else{
-                            NotificationCenter.default.post(name: self.notificationRodando.name, object: processM)
-                        }
+                    
+                    
+                    var processM = process
+                    
+                    if processM.addTime(tempo: timer){
+                        self.removeProcess(processo: process)
+                        processM.isFinished = true
+                        memoriaAlocada -= process.tamanhoProcesso
+                        NotificationCenter.default.post(name: self.notificationFinalizou.name, object: processM)
+                    }else{
+                        NotificationCenter.default.post(name: self.notificationRodando.name, object: processM)
+                    }
                     enqueue()
-
-
+                    
+                    
                 }
-
-                self.viewModel.rams =  self.viewModel.rams.sorted { $0.posicaoInicio! < $1.posicaoInicio!}
-              
-        }
+            }.store(in: &cancellables)
     }
+    
+    init( nr: Notify, nf: Notify){
+        
+        self.notificationRodando = nr
+        self.notificationFinalizou = nf
+        
+        listenToNotications()
+       
+
+        self.viewModel.rams =  self.viewModel.rams.sorted { $0.posicaoInicio! < $1.posicaoInicio!}
+              
+    }
+    
 }

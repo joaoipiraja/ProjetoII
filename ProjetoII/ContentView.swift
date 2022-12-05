@@ -195,6 +195,9 @@ struct ContentView: View {
         .onReceive(c.processesFinalizados.publisher, perform: { _ in
             showingAlert = c.processesEntrou.count == c.processesFinalizados.count
             self.progress =  100.0 * Double(self.c.processesFinalizados.count) / Double(self.c.processesEntrou.count)
+            DispatchQueue.main.async {
+                self.ram.objectWillChange.send()
+            }
 
             
         }).alert("TempoMedio = \(calculateTempoMedio())s", isPresented: $showingAlert) {
@@ -202,14 +205,20 @@ struct ContentView: View {
                 showingAlert = false
             }
         }.sheet(isPresented: $showingSheet, onDismiss: {
-            c.processesFinalizados = []
+            
+            self.ram.listenToNotications()
+            self.c.listenToNotications()
+            
             self.ram.viewModel.rams = []
+            self.ram.memoriaAlocada = 0
             self.c.processesEntrou = []
             self.c.processesFinalizados = []
             self.progress = 0.0
             
             generateInitialState()
             generateProcesses()
+            
+
             
         }) {
             Sheet(viewModel: sheetViewModel)

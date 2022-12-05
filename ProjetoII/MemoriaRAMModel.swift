@@ -6,16 +6,6 @@
 //
 
 import Foundation
-// 1000 MB
-//0 - 999
-// 0 - 99 - S0
-// 100-
-
-// Processo + Buraco
-// Divide o p
-
-
-
 
 
 class MemoriaRAMModel: ObservableObject, Identifiable{
@@ -46,6 +36,6 @@ class MemoriaRAMModel: ObservableObject, Identifiable{
         self.posicaoInicio = posicaoInicio
         self.posicaoFim = posicaoFim
     }
-    static var MOCK = MemoriaRAMModel(tipo: .buraco, posicaoInicio: 0, posicaoFim: 1)
+    static var MOCK = MemoriaRAMModel(tipo: .processo(processo: .init(duracaoProcesso: 10, tamanhoProcesso: 10, tempoCriacao: 10)), posicaoInicio: 0, posicaoFim: 1)
     
 }

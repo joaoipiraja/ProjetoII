@@ -50,12 +50,8 @@ class Controladora: ObservableObject{
         
     }
     
-    
-    
-    init(nf: Notify, ne: Notify){
-
-            self.notificationEspera = ne
-            self.notificationFinalizou = nf
+    func listenToNotications(){
+            self.cancellables.removeAll()
         
             self.notificationEspera.publisher
             .merge(with: self.notificationFinalizou.publisher)
@@ -84,8 +80,13 @@ class Controladora: ObservableObject{
 
             }
         }.store(in: &cancellables)
-        
-       
+    }
+    
+    init(nf: Notify, ne: Notify){
+
+            self.notificationEspera = ne
+            self.notificationFinalizou = nf
+            listenToNotications()
 
     }
 }

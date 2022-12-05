@@ -25,10 +25,31 @@ class Process: ObservableObject{
    var tempoCriacaoSeconds: Int
    @Published var tempoCriacao: Date? = nil
    @Published var tempoInicio: Date? = nil
-   @Published private var tempoFinal: Date? = nil
+   private var tempoFinal: Date? = nil
    @Published var tempoAtual: Date? = nil
     
+    var progress: Double{
+        get{
+            if let tempoAtual = self.tempoAtual{
+                if let tempoFinal = self.tempoFinal{
+                   return 1.0 - (tempoFinal - tempoAtual)
+                }
+            }
+            return 0
+            
+        }
+    }
     
+    var tempoRestante: Double{
+        get{
+            if let tempoAtual = self.tempoAtual{
+                if let tempoFinal = self.tempoFinal{
+                   return (tempoFinal - tempoAtual)
+                }
+            }
+            return 0
+        }
+    }
     
     public var description: String {
             return

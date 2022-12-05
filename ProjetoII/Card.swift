@@ -13,6 +13,7 @@ import SwiftUI
 struct Card: View{
 
     @ObservedObject var ram: MemoriaRAMModel
+    @State var progress:Double = 0.0
 
     var body: some View{
        
@@ -40,17 +41,19 @@ struct Card: View{
             ZStack{
                 Color.red.ignoresSafeArea()
                 VStack(){
+                   
+                        
                     Text("\(ram.posicaoInicio ?? -1)")
                         .font(.system(size: 30))
-                        .foregroundColor(.white)
                     Spacer()
-                    Text("\(p.idString)").foregroundColor(.white)
+                    Text("\(p.idString)")
                         .font(.system(size: 30))
+                    ProgressView().progressViewStyle(CircularProgressViewStyle(tint: .white))
                     Spacer()
                     Text("\(ram.posicaoFim ?? -1)")
                         .font(.system(size: 30))
-                        .foregroundColor(.white)
-                }.padding()
+                        
+                }.padding().foregroundColor(.white)
             }
 
             case .buraco:
