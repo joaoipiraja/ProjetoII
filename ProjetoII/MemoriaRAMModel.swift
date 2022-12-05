@@ -27,15 +27,15 @@ class MemoriaRAMModel: ObservableObject, Identifiable{
     }
     
     let id = UUID()
-    @Published var posicaoInicio:Int?
-    @Published var posicaoFim:Int?
+    @Published var posicaoInicio:Int = 0
+    @Published var posicaoFim:Int = 0
     var tipo: Tipo
+    var tamanho: Int?
     
-    init(tipo: Tipo, posicaoInicio: Int? = nil, posicaoFim: Int? = nil){
+    init(tipo: Tipo, tamanho:Int? = nil){
         self.tipo = tipo
-        self.posicaoInicio = posicaoInicio
-        self.posicaoFim = posicaoFim
+        self.tamanho = tamanho
     }
-    static var MOCK = MemoriaRAMModel(tipo: .processo(processo: .init(duracaoProcesso: 10, tamanhoProcesso: 10, tempoCriacao: 10)), posicaoInicio: 0, posicaoFim: 1)
+    static var MOCK = MemoriaRAMModel(tipo: .processo(processo: .init(duracaoProcesso: 10, tamanhoProcesso: 10, tempoCriacao: 10)), tamanho: 10)
     
 }

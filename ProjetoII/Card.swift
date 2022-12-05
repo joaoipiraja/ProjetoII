@@ -14,6 +14,8 @@ struct Card: View{
 
     @ObservedObject var ram: MemoriaRAMModel
     @State var progress:Double = 0.0
+ 
+
 
     var body: some View{
        
@@ -22,7 +24,7 @@ struct Card: View{
             ZStack{
                 Color.blue.ignoresSafeArea()
                 VStack{
-                    Text("\(ram.posicaoInicio ?? -1)")
+                    Text("\(self.ram.posicaoInicio ?? -1)")
                         .font(.system(size: 30))
                         .foregroundColor(.white)
                     Spacer()
@@ -30,7 +32,7 @@ struct Card: View{
                         .font(.system(size: 30))
                         .foregroundColor(.white)
                     Spacer()
-                    Text("\(ram.posicaoFim ?? -1)")
+                    Text("\(self.ram.posicaoFim  ?? -1)")
                         .font(.system(size: 30))
                         .foregroundColor(.white)
                 }.padding()
@@ -42,16 +44,17 @@ struct Card: View{
                 Color.red.ignoresSafeArea()
                 VStack(){
                    
-                        
-                    Text("\(ram.posicaoInicio ?? -1)")
+                    Text("\(self.ram.posicaoInicio ?? -1)")
                         .font(.system(size: 30))
+                        .foregroundColor(.white)
                     Spacer()
                     Text("\(p.idString)")
                         .font(.system(size: 30))
                     ProgressView().progressViewStyle(CircularProgressViewStyle(tint: .white))
                     Spacer()
-                    Text("\(ram.posicaoFim ?? -1)")
+                    Text("\(self.ram.posicaoFim ?? -1)")
                         .font(.system(size: 30))
+                        .foregroundColor(.white)
                         
                 }.padding().foregroundColor(.white)
             }
@@ -61,17 +64,19 @@ struct Card: View{
             ZStack{
                 Color.red.opacity(0.5).ignoresSafeArea()
                 VStack{
-                    Text("\(ram.posicaoInicio ?? -1)")
-                        .font(.system(size: 30))
-                        .foregroundColor(.white)
+                    
+                     Text("\(self.ram.posicaoInicio ?? -1)")
+                         .font(.system(size: 30))
+                         .foregroundColor(.white)
                     Spacer()
                     Text("Buraco")
                         .font(.system(size: 30))
                         .foregroundColor(.white)
                     Spacer()
-                    Text("\(ram.posicaoFim ?? -1)")
+                    Text("\(self.ram.posicaoFim  ?? -1)")
                         .font(.system(size: 30))
                         .foregroundColor(.white)
+                    
                 }.padding()
             }
 

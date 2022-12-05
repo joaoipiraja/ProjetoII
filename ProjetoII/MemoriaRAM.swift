@@ -56,7 +56,7 @@ class MemoriaRAM: ObservableObject{
                   case .processo(processo: _):
                       return (index,0)
                   case .buraco:
-                      return (index,ram.posicaoFim! - ram.posicaoInicio!)
+                    return  (index,ram.tamanho!)
               }
               }.filter {$0.1 > 0}
           
@@ -131,22 +131,22 @@ class MemoriaRAM: ObservableObject{
             case .processo(processo: _):
                 return (index, -1)
             case .buraco:
-                return (index, ram.posicaoFim! - ram.posicaoInicio!)
+                return (index, ram.tamanho!)
             }
             
         }.filter{$0.1 > 0}
         
         if let listSplit = splitByMissingInteger(array: listOfIndexes){
                 print(listSplit)
-                listSplit.filter{$0.count > 2}.forEach { array in
+                listSplit.filter{$0.count >= 2}.forEach { array in
                
                         let sum = array.map{$0.1}.reduce(0, +)
-                        
+
                         let indexFirst = (array.first?.0)!
                         let indexLast = (array.last?.0)!
-
+                    
                         let inicial = self.viewModel.rams[indexFirst]
-                        let buraco = MemoriaRAMModel(tipo: .buraco, posicaoInicio: inicial.posicaoInicio, posicaoFim: inicial.posicaoInicio! + sum)
+                        let buraco = MemoriaRAMModel(tipo: .buraco, tamanho: sum )
                         
                         self.viewModel.rams[indexFirst] = buraco
                         self.viewModel.rams.removeSubrange(indexFirst+1...indexLast)
@@ -218,23 +218,10 @@ class MemoriaRAM: ObservableObject{
                         //Particiona
                     
                         var aux = self.viewModel.rams[index]
+                        aux.tamanho = (aux.tamanho ?? 0) - processo.tamanhoProcesso
+                        
                     
-   
-
-                
-                    
-                    
-                    if(((ram.posicaoFim ?? 0) - (ram.posicaoInicio ?? 0) ) >= (memoria - memoriaAlocada)){
-                            let tip = ram.tipo
-                            self.viewModel.rams[index].tipo = tip                  }else{
-                            ram.posicaoInicio = aux.posicaoInicio
-                            ram.posicaoFim =  aux.posicaoInicio! + processo.tamanhoProcesso
-                            
-                            let spaceLeft = (aux.posicaoFim! - aux.posicaoInicio!) - processo.tamanhoProcesso
-                            
-                            aux.posicaoInicio = ram.posicaoFim! + 1
-                            aux.posicaoFim! = spaceLeft + aux.posicaoInicio!
-                            
+                        if(aux.tamanho! > 0){
                             if(index+1 > self.viewModel.rams.count){
                                 self.viewModel.rams[index] = ram
                                 self.viewModel.rams[index+1] = aux
@@ -242,8 +229,11 @@ class MemoriaRAM: ObservableObject{
                                 self.viewModel.rams[index] = ram
                                 self.viewModel.rams.append(aux)
                             }
-                            
+                        }else{
+                            self.viewModel.rams[index] = ram
                         }
+                
+                    
 
     
                     case .buraco:
@@ -307,8 +297,7 @@ class MemoriaRAM: ObservableObject{
         listenToNotications()
        
 
-        self.viewModel.rams =  self.viewModel.rams.sorted { $0.posicaoInicio! < $1.posicaoInicio!}
-              
+     
     }
     
 }

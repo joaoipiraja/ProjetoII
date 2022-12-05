@@ -22,7 +22,8 @@ struct ContentView: View {
     @State private var showingAlert = false
     
     @State private var progress: Double = 0.0
-
+    @State private var arrayOfRam = Array<MemoriaRAMModel>()
+    
     
     var nf: Notify = .init(name: "finalizou")
     var nr: Notify = .init(name: "rodando")
@@ -65,9 +66,9 @@ struct ContentView: View {
         
         self.ram.memoria = self.sheetViewModel.tamanhoMemoria - self.sheetViewModel.tamanhoMemoriaSistemaOperacional
         
-        let so = MemoriaRAMModel(tipo: .so, posicaoInicio: 0, posicaoFim: self.sheetViewModel.tamanhoMemoriaSistemaOperacional)
+        let so = MemoriaRAMModel(tipo: .so, tamanho: self.sheetViewModel.tamanhoMemoriaSistemaOperacional)
         
-        let buraco = MemoriaRAMModel(tipo: .buraco, posicaoInicio: so.posicaoFim! + 1, posicaoFim: (so.posicaoFim! + 1) + (self.ram.memoriaTotal - self.sheetViewModel.tamanhoMemoriaSistemaOperacional) )
+        let buraco = MemoriaRAMModel(tipo: .buraco, tamanho:  self.ram.memoriaTotal - self.sheetViewModel.tamanhoMemoriaSistemaOperacional)
         
         self.ram.viewModel.rams.append(so)
         self.ram.viewModel.rams.append(buraco)
@@ -136,8 +137,27 @@ struct ContentView: View {
             
             Section{
                 HStack{
-                    ForEach(ram.viewModel.rams, id: \.id) { ram in
+                    ForEach(self.ram.viewModel.rams, id: \.id) { ram in
                         Card(ram: ram)
+                    }
+                    .onReceive(self.ram.viewModel.rams.publisher) { _ in
+                        self.ram.viewModel.rams = self.ram.viewModel.rams.reduce(into: Array<MemoriaRAMModel>()) { restante, elemento in
+                            
+                            if let last = restante.last{
+                                
+                                elemento.posicaoInicio = last.posicaoFim + 1
+                                elemento.posicaoFim = elemento.posicaoInicio + elemento.tamanho!
+                                
+                            }else{
+                                elemento.posicaoInicio = 0
+                                elemento.posicaoFim =  elemento.tamanho!
+                            }
+                          
+                            
+                            restante.append(elemento)
+                            
+                        }
+                    
                     }
                 }
             }header: {
@@ -206,17 +226,23 @@ struct ContentView: View {
             }
         }.sheet(isPresented: $showingSheet, onDismiss: {
             
-            self.ram.listenToNotications()
-            self.c.listenToNotications()
+           
             
-            self.ram.viewModel.rams = []
-            self.ram.memoriaAlocada = 0
-            self.c.processesEntrou = []
-            self.c.processesFinalizados = []
-            self.progress = 0.0
+            DispatchQueue.main.async{
+                self.ram.listenToNotications()
+                self.c.listenToNotications()
+                
+                self.ram.viewModel.rams = []
+                self.ram.memoriaAlocada = 0
+                self.c.processesEntrou = []
+                self.c.processesFinalizados = []
+                self.progress = 0.0
+                self.generateInitialState()
+                self.generateProcesses()
+            }
+           
             
-            generateInitialState()
-            generateProcesses()
+          
             
 
             

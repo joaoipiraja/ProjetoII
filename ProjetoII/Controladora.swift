@@ -20,8 +20,8 @@ class Controladora: ObservableObject{
     
     var cancellables = Set<AnyCancellable>()
     
-    @Published var processesFinalizados = Array<Process>()
-    @Published var processesEntrou = Array<Process>()
+    @Published var processesFinalizados: Array<Process>
+    @Published var processesEntrou: Array<Process>
 
     
 
@@ -67,7 +67,7 @@ class Controladora: ObservableObject{
                     
                 }else{
                     
-                    let ram = MemoriaRAMModel(tipo: .processo(processo: process))
+                    let ram = MemoriaRAMModel(tipo: .processo(processo: process), tamanho: process.tamanhoProcesso)
                     NotificationCenter.default.post(name:Notification.Name("rodando"), object: ram)
                     
                     //self.queue.enqueue(process)
@@ -86,6 +86,10 @@ class Controladora: ObservableObject{
 
             self.notificationEspera = ne
             self.notificationFinalizou = nf
+        
+            self.processesEntrou = Array<Process>()
+            self.processesFinalizados = Array<Process>()
+            
             listenToNotications()
 
     }
