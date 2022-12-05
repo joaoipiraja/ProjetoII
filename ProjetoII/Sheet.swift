@@ -69,7 +69,7 @@ struct Sheet: View {
                        )
                        Stepper("Máximo: \(viewModel.intervaloTamanhoProcesso.maximo)",
                            value: $viewModel.intervaloTamanhoProcesso.maximo,
-                           in: viewModel.tamanhoMemoria+1...viewModel.tamanhoMemoria
+                           in: 0...viewModel.tamanhoMemoria
                        )
 
                    }header: {

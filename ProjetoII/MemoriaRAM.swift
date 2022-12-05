@@ -103,21 +103,61 @@ class MemoriaRAM: ObservableObject{
     }
     
     
-    func mergeBuracos(){
-        
-        if let indexFirst = try? viewModel.rams.firstIndex(where: { $0.tipo == .buraco}){
-            if let indexLast = try? viewModel.rams.lastIndex(where: { $0.tipo == .buraco}){
-                let ram = MemoriaRAMModel(tipo: .buraco, posicaoInicio: self.viewModel.rams[indexFirst].posicaoInicio, posicaoFim: self.viewModel.rams[indexLast].posicaoFim! - (indexLast-indexFirst))
-               
-                
-                if(indexLast > indexFirst){
-                    self.viewModel.rams[indexFirst] = ram
-                    self.viewModel.rams.removeSubrange(indexFirst+1...indexLast)
-                    
-                    
-                }
+    func splitByMissingInteger(array: [(Int,Int)]) -> [[(Int,Int)]]? {
+        var arrayFinal :[[(Int,Int)]] = [ [(Int,Int)]() ]
+        var i = 0
+        for num in array{
+            if arrayFinal[i].isEmpty || (arrayFinal[i].last == nil){
+                arrayFinal[i].append(num)
+            } else if num.0 == (arrayFinal[i].last!.0 + 1){
+                arrayFinal[i].append(num)
+            } else {
+                i += 1
+                arrayFinal.append([(Int,Int)]())
+                arrayFinal[i].append(num)
             }
         }
+        return arrayFinal
+    }
+    
+    
+    func mergeBuracos(){
+        
+        let listOfIndexes = self.viewModel.rams.enumerated().map { (index,ram) in
+            switch ram.tipo{
+                
+            case .so:
+                return (index, -1)
+            case .processo(processo: _):
+                return (index, -1)
+            case .buraco:
+                return (index, ram.posicaoFim! - ram.posicaoInicio!)
+            }
+            
+        }.filter{$0.1 > 0}
+        
+        if let listSplit = splitByMissingInteger(array: listOfIndexes){
+                print(listSplit)
+                listSplit.filter{$0.count > 2}.forEach { array in
+               
+                        let sum = array.map{$0.1}.reduce(0, +)
+                        
+                        let indexFirst = (array.first?.0)!
+                        let indexLast = (array.last?.0)!
+
+                        let inicial = self.viewModel.rams[indexFirst]
+                        let buraco = MemoriaRAMModel(tipo: .buraco, posicaoInicio: inicial.posicaoInicio, posicaoFim: inicial.posicaoInicio! + sum)
+                        
+                        self.viewModel.rams[indexFirst] = buraco
+                        self.viewModel.rams.removeSubrange(indexFirst+1...indexLast)
+                        
+                    
+         
+                }
+                
+            }
+        
+      
         
             self.viewModel.objectWillChange.send()
         
@@ -157,7 +197,7 @@ class MemoriaRAM: ObservableObject{
                         }
                 }
         
-        self.viewModel.objectWillChange.send()
+       // self.viewModel.objectWillChange.send()
 
     }
     
@@ -178,16 +218,22 @@ class MemoriaRAM: ObservableObject{
                         //Particiona
                     
                         var aux = self.viewModel.rams[index]
+                    
+   
 
                 
-                        ram.posicaoInicio = aux.posicaoInicio
-                        ram.posicaoFim =  aux.posicaoInicio! + processo.tamanhoProcesso
                     
-                        if((ram.posicaoFim! -  ram.posicaoInicio!) >= (self.memoria - self.memoriaAlocada) && (ram.posicaoFim! -  ram.posicaoInicio!) > 0){
-                            self.viewModel.rams[index] = ram
-                        }else{
+                    
+                    if(((ram.posicaoFim ?? 0) - (ram.posicaoInicio ?? 0) ) >= (memoria - memoriaAlocada)){
+                            let tip = ram.tipo
+                            self.viewModel.rams[index].tipo = tip                  }else{
+                            ram.posicaoInicio = aux.posicaoInicio
+                            ram.posicaoFim =  aux.posicaoInicio! + processo.tamanhoProcesso
+                            
+                            let spaceLeft = (aux.posicaoFim! - aux.posicaoInicio!) - processo.tamanhoProcesso
+                            
                             aux.posicaoInicio = ram.posicaoFim! + 1
-                            aux.posicaoFim! += 1
+                            aux.posicaoFim! = spaceLeft + aux.posicaoInicio!
                             
                             if(index+1 > self.viewModel.rams.count){
                                 self.viewModel.rams[index] = ram

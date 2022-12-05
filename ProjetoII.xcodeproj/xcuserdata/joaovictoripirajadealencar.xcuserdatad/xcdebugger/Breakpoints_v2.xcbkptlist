@@ -7,15 +7,31 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "A022135F-E5C7-4843-8784-8F909A3EA54D"
+            uuid = "EAF82C24-CF10-48C2-9991-21D772DAAFC6"
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ProjetoII/MemoriaRAM.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "184"
-            endingLineNumber = "184"
+            startingLineNumber = "295"
+            endingLineNumber = "295"
+            landmarkName = "listenToNotications()"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "126BA53D-0C32-4CED-B80F-08CA3721178D"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "ProjetoII/MemoriaRAM.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "206"
+            endingLineNumber = "206"
             landmarkName = "addProcess(ram:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -23,20 +39,52 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "D4911DFA-8508-4F0C-AB61-786D531C4D0A"
+            uuid = "F82161ED-3D77-4F27-A9FB-C5EF6653686D"
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ProjetoII/MemoriaRAM.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "108"
-            endingLineNumber = "108"
+            startingLineNumber = "224"
+            endingLineNumber = "224"
+            landmarkName = "addProcess(ram:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "49F3C88C-F00E-46BB-9FC6-81DAC4AFBB51"
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "ProjetoII/MemoriaRAM.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "247"
+            endingLineNumber = "247"
+            landmarkName = "addProcess(ram:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "1C6A43A3-B526-48C2-8191-2D73ECE84278"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "ProjetoII/MemoriaRAM.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "139"
+            endingLineNumber = "139"
             landmarkName = "mergeBuracos()"
             landmarkType = "7">
             <Locations>
                <Location
-                  uuid = "D4911DFA-8508-4F0C-AB61-786D531C4D0A - b5056be10640c475"
+                  uuid = "1C6A43A3-B526-48C2-8191-2D73ECE84278 - b5056be10640cfd1"
                   shouldBeEnabled = "Yes"
                   ignoreCount = "0"
                   continueAfterRunningActions = "No"
@@ -46,12 +94,12 @@
                   urlString = "file:///Users/joaovictoripirajadealencar/Documents/GitHub/ProjetoII/ProjetoII/MemoriaRAM.swift"
                   startingColumnNumber = "9223372036854775807"
                   endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "103"
-                  endingLineNumber = "103"
-                  offsetFromSymbolStart = "116">
+                  startingLineNumber = "139"
+                  endingLineNumber = "139"
+                  offsetFromSymbolStart = "396">
                </Location>
                <Location
-                  uuid = "D4911DFA-8508-4F0C-AB61-786D531C4D0A - b5056be10640c475"
+                  uuid = "1C6A43A3-B526-48C2-8191-2D73ECE84278 - b5056be10640cfd1"
                   shouldBeEnabled = "Yes"
                   ignoreCount = "0"
                   continueAfterRunningActions = "No"
@@ -61,24 +109,9 @@
                   urlString = "file:///Users/joaovictoripirajadealencar/Documents/GitHub/ProjetoII/ProjetoII/MemoriaRAM.swift"
                   startingColumnNumber = "9223372036854775807"
                   endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "103"
-                  endingLineNumber = "103"
-                  offsetFromSymbolStart = "276">
-               </Location>
-               <Location
-                  uuid = "D4911DFA-8508-4F0C-AB61-786D531C4D0A - f59b2094069b229d"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "closure #1 (ProjetoII.MemoriaRAMModel) -&gt; Swift.Bool in ProjetoII.MemoriaRAM.mergeBuracos() -&gt; ()"
-                  moduleName = "ProjetoII"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/joaovictoripirajadealencar/Documents/GitHub/ProjetoII/ProjetoII/MemoriaRAM.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "103"
-                  endingLineNumber = "103"
-                  offsetFromSymbolStart = "36">
+                  startingLineNumber = "139"
+                  endingLineNumber = "139"
+                  offsetFromSymbolStart = "432">
                </Location>
             </Locations>
          </BreakpointContent>
@@ -86,17 +119,49 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "3E2F7B95-A2F0-42B3-8C98-28E8B76C5AB8"
+            uuid = "B3240027-499A-4DC4-807E-11D7913B6BE8"
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ProjetoII/MemoriaRAM.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "111"
-            endingLineNumber = "111"
+            startingLineNumber = "141"
+            endingLineNumber = "141"
             landmarkName = "mergeBuracos()"
             landmarkType = "7">
+            <Locations>
+               <Location
+                  uuid = "B3240027-499A-4DC4-807E-11D7913B6BE8 - b5056be10640cf6f"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "ProjetoII.MemoriaRAM.mergeBuracos() -&gt; ()"
+                  moduleName = "ProjetoII"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/joaovictoripirajadealencar/Documents/GitHub/ProjetoII/ProjetoII/MemoriaRAM.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "141"
+                  endingLineNumber = "141"
+                  offsetFromSymbolStart = "620">
+               </Location>
+               <Location
+                  uuid = "B3240027-499A-4DC4-807E-11D7913B6BE8 - acbe095546b79092"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "closure #3 (Swift.Array&lt;(Swift.Int, Swift.Int)&gt;) -&gt; () in ProjetoII.MemoriaRAM.mergeBuracos() -&gt; ()"
+                  moduleName = "ProjetoII"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/joaovictoripirajadealencar/Documents/GitHub/ProjetoII/ProjetoII/MemoriaRAM.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "142"
+                  endingLineNumber = "142"
+                  offsetFromSymbolStart = "164">
+               </Location>
+            </Locations>
          </BreakpointContent>
       </BreakpointProxy>
    </Breakpoints>
