@@ -213,7 +213,9 @@ struct ContentView: View {
        
        
         .onReceive(c.processesFinalizados.publisher, perform: { _ in
-            showingAlert = c.processesEntrou.count == c.processesFinalizados.count
+            showingAlert = c.processesEntrou.count == c.processesFinalizados.count &&
+                c.processesFinalizados.count > 0
+            
             self.progress =  100.0 * Double(self.c.processesFinalizados.count) / Double(self.c.processesEntrou.count)
             DispatchQueue.main.async {
                 self.ram.objectWillChange.send()

@@ -65,11 +65,11 @@ struct Sheet: View {
                    Section{
                        Stepper("Minimo: \(viewModel.intervaloTamanhoProcesso.minimo)",
                            value: $viewModel.intervaloTamanhoProcesso.minimo,
-                               in: 0...viewModel.tamanhoMemoria
+                               in: 0...(viewModel.tamanhoMemoria-viewModel.tamanhoMemoriaSistemaOperacional)
                        )
                        Stepper("Máximo: \(viewModel.intervaloTamanhoProcesso.maximo)",
                            value: $viewModel.intervaloTamanhoProcesso.maximo,
-                           in: 0...viewModel.tamanhoMemoria
+                           in: 0...(viewModel.tamanhoMemoria-viewModel.tamanhoMemoriaSistemaOperacional)
                        )
 
                    }header: {

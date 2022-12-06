@@ -44,7 +44,7 @@ class MemoriaRAM: ObservableObject{
     @Published var memoriaAlocada = 0
     
     
-    func findRole(alg: EstrategiaAlocacao) -> Int?{
+    func findRole(alg: EstrategiaAlocacao, tamanho: Int) -> Int?{
           
           var distance = self.viewModel.rams.enumerated()
 
@@ -61,19 +61,19 @@ class MemoriaRAM: ObservableObject{
               }.filter {$0.1 > 0}
           
           
-          let max = distance.sorted(by: {$0.1 > $1.1}).first
-          let min = distance.sorted(by: {$0.1 < $1.1}).first
+        let max = distance.sorted(by: {$0.1 > $1.1}).filter{$0.1 >= tamanho}.first
+        let min = distance.sorted(by: {$0.1 < $1.1}).filter{$0.1 >= tamanho}.first
           
           
-
+        
           
           switch alg{
               case .bestFit:
-                  return max?.0
+                  return min?.0
               case .firstFit:
                   return try? self.viewModel.rams.firstIndex(where: {$0.tipo == .buraco})
               case .worstFit:
-                  return min?.0
+                  return max?.0
           }
       }
     
@@ -205,7 +205,7 @@ class MemoriaRAM: ObservableObject{
         
         
                 
-        if let index = findRole(alg:  self.estrategiaAlocacao){
+        if let index = findRole(alg:  self.estrategiaAlocacao, tamanho: ram.tamanho ?? 0){
                 
                 
                 switch ram.tipo{
