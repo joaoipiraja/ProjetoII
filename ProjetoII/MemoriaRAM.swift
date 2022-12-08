@@ -69,13 +69,13 @@ class MemoriaRAM: ObservableObject{
               switch ram.tipo{
                       
                   case .so:
-                      return (index,0)
+                      return (index,-1)
                   case .processo(processo: _):
-                      return (index,0)
+                      return (index,-1)
                   case .buraco:
                     return  (index,ram.tamanho!)
               }
-              }.filter {$0.1 > 0}
+              }.filter {$0.1 > -1}
           
           
         let max = distance.sorted(by: {$0.1 > $1.1}).filter{$0.1 >= tamanho}.first
@@ -88,7 +88,7 @@ class MemoriaRAM: ObservableObject{
               case .bestFit:
                   return min?.0
               case .firstFit:
-                  return try? self.viewModel.rams.firstIndex(where: {$0.tipo == .buraco})
+              return try? self.viewModel.rams.lastIndex(where: {$0.tipo == .buraco})
               case .worstFit:
                   return max?.0
           }
