@@ -24,17 +24,20 @@ struct Card: View{
             ZStack{
                 Color.blue.ignoresSafeArea()
                 VStack{
-                    Text("\(self.ram.posicaoInicio ?? -1)")
-                        .font(.system(size: 30))
-                        .foregroundColor(.white)
+//                    Text("\(self.ram.posicaoInicio ?? -1)")
+//                        .font(.system(size: 30))
+//                        .foregroundColor(.white)
                     Spacer()
                     Text("S.O")
                         .font(.system(size: 30))
                         .foregroundColor(.white)
-                    Spacer()
-                    Text("\(self.ram.posicaoFim  ?? -1)")
+                    Text("\(ram.tamanho ?? -1)")
                         .font(.system(size: 30))
                         .foregroundColor(.white)
+                    Spacer()
+//                    Text("\(self.ram.posicaoFim  ?? -1)")
+//                        .font(.system(size: 30))
+//                        .foregroundColor(.white)
                 }.padding()
             }
 
@@ -44,17 +47,15 @@ struct Card: View{
                 Color.red.ignoresSafeArea()
                 VStack(){
                    
-                    Text("\(self.ram.posicaoInicio ?? -1)")
-                        .font(.system(size: 30))
-                        .foregroundColor(.white)
                     Spacer()
                     Text("\(p.idString)")
                         .font(.system(size: 30))
-                    ProgressView().progressViewStyle(CircularProgressViewStyle(tint: .white))
-                    Spacer()
-                    Text("\(self.ram.posicaoFim ?? -1)")
+                    Text("\(ram.tamanho ?? -1)")
                         .font(.system(size: 30))
                         .foregroundColor(.white)
+                    ProgressView().progressViewStyle(CircularProgressViewStyle(tint: .white))
+                    Spacer()
+                  
                         
                 }.padding().foregroundColor(.white)
             }
@@ -65,17 +66,16 @@ struct Card: View{
                 Color.red.opacity(0.5).ignoresSafeArea()
                 VStack{
                     
-                     Text("\(self.ram.posicaoInicio ?? -1)")
-                         .font(.system(size: 30))
-                         .foregroundColor(.white)
+              
                     Spacer()
                     Text("Buraco")
                         .font(.system(size: 30))
                         .foregroundColor(.white)
-                    Spacer()
-                    Text("\(self.ram.posicaoFim  ?? -1)")
+                    Text("\(ram.tamanho ?? -1)")
                         .font(.system(size: 30))
                         .foregroundColor(.white)
+                    Spacer()
+                 
                     
                 }.padding()
             }

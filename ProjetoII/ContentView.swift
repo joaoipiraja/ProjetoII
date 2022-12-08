@@ -49,7 +49,7 @@ struct ContentView: View {
     
     func generateProcesses(){
         
-        for _ in Range(0...self.sheetViewModel.qntdProcessos){
+        for _ in Range(0...self.sheetViewModel.qntdProcessos-1){
             let randomTempoCriacao = self.sheetViewModel.intervaloTempoCriacao.range.randomElement()!
             let randomDuracao = self.sheetViewModel.intervaloDuracao.range.randomElement()!
             let randomTamanho = self.sheetViewModel.intervaloTamanhoProcesso.range.randomElement()!
@@ -214,7 +214,7 @@ struct ContentView: View {
        
         .onReceive(c.processesFinalizados.publisher, perform: { _ in
             showingAlert = c.processesEntrou.count == c.processesFinalizados.count &&
-                c.processesFinalizados.count > 0
+                c.processesEntrou.count > 0
             
             self.progress =  100.0 * Double(self.c.processesFinalizados.count) / Double(self.c.processesEntrou.count)
             DispatchQueue.main.async {

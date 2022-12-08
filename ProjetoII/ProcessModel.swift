@@ -25,7 +25,7 @@ class Process: ObservableObject{
    var tempoCriacaoSeconds: Int
    @Published var tempoCriacao: Date? = nil
    @Published var tempoInicio: Date? = nil
-   private var tempoFinal: Date? = nil
+    var tempoFinal: Date? = nil
    @Published var tempoAtual: Date? = nil
     
     var progress: Double{
