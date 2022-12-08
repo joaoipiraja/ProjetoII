@@ -372,7 +372,11 @@ class MemoriaRAM: ObservableObject{
                 self.mergeBuracos()
                 if let index = self.viewModel.rams.lastIndex(where: {$0.tipo == .buraco}){
                     let dif = memoria - sumProcessTotal()
-                    self.viewModel.rams[index].tamanho = dif
+                    if(dif != 0){
+                        self.viewModel.rams[index].tamanho = dif
+                    }else{
+                        self.viewModel.rams.remove(at: index)
+                    }
                 }
 
             }.store(in: &cancellables)
