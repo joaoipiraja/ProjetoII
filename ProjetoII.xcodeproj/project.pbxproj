@@ -22,6 +22,7 @@
 		4E3A02BF2925557A0075D0E1 /* ProjetoIIUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E3A02BE2925557A0075D0E1 /* ProjetoIIUITests.swift */; };
 		4E3A02C12925557A0075D0E1 /* ProjetoIIUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E3A02C02925557A0075D0E1 /* ProjetoIIUITestsLaunchTests.swift */; };
 		4E4EBB43293AEE240015DE4C /* Sheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E4EBB42293AEE240015DE4C /* Sheet.swift */; };
+		4E4EBB562948DDBC0015DE4C /* Generator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E4EBB552948DDBC0015DE4C /* Generator.swift */; };
 		4E8097A6293256E400B6F5CB /* Card.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E8097A5293256E400B6F5CB /* Card.swift */; };
 /* End PBXBuildFile section */
 
@@ -61,6 +62,7 @@
 		4E3A02BE2925557A0075D0E1 /* ProjetoIIUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProjetoIIUITests.swift; sourceTree = "<group>"; };
 		4E3A02C02925557A0075D0E1 /* ProjetoIIUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProjetoIIUITestsLaunchTests.swift; sourceTree = "<group>"; };
 		4E4EBB42293AEE240015DE4C /* Sheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sheet.swift; sourceTree = "<group>"; };
+		4E4EBB552948DDBC0015DE4C /* Generator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Generator.swift; sourceTree = "<group>"; };
 		4E8097A5293256E400B6F5CB /* Card.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Card.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -180,6 +182,7 @@
 			children = (
 				4E1BAFEB292D033200B1ACB5 /* MemoriaRAM.swift */,
 				4E1BAFED292D035200B1ACB5 /* Controladora.swift */,
+				4E4EBB552948DDBC0015DE4C /* Generator.swift */,
 			);
 			path = ViewModel;
 			sourceTree = "<group>";
@@ -341,6 +344,7 @@
 				4E4EBB43293AEE240015DE4C /* Sheet.swift in Sources */,
 				4E1BAFEC292D033200B1ACB5 /* MemoriaRAM.swift in Sources */,
 				4E8097A6293256E400B6F5CB /* Card.swift in Sources */,
+				4E4EBB562948DDBC0015DE4C /* Generator.swift in Sources */,
 				4E3A02A4292555790075D0E1 /* ProjetoIIApp.swift in Sources */,
 				4E1BAFE4292D02B000B1ACB5 /* Extensios.swift in Sources */,
 			);

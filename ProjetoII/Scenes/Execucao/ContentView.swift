@@ -9,45 +9,7 @@ import SwiftUI
 import Combine
 
 
-class Generator{
-    
-    
-    static func initialState(sheetViewModel: SheetViewModel, ram: MemoriaRAM){
-        ram.estrategiaAlocacao = sheetViewModel.alocacao
-        
-        ram.memoriaTotal = sheetViewModel.tamanhoMemoria
-        
-        ram.memoriaDisponivel = sheetViewModel.tamanhoMemoria - sheetViewModel.tamanhoMemoriaSistemaOperacional
-        
-        let so = MemoriaRAMModel(tipo: .so, tamanho: sheetViewModel.tamanhoMemoriaSistemaOperacional)
-        
-        let buraco = MemoriaRAMModel(tipo: .buraco, tamanho:  ram.memoriaTotal - sheetViewModel.tamanhoMemoriaSistemaOperacional)
-        
-        ram.viewModel.processosExecucao.append(so)
-        ram.viewModel.processosExecucao.append(buraco)
 
-
-        DispatchQueue.main.async {
-            ram.objectWillChange.send()
-        }
-    }
-    
-    static func processes(sheetViewModel: SheetViewModel, controladora: Controladora){
-        
-        for _ in Range(0...sheetViewModel.qntdProcessos-1){
-            let randomTempoCriacao = sheetViewModel.intervaloTempoCriacao.range.randomElement()!
-            let randomDuracao = sheetViewModel.intervaloDuracao.range.randomElement()!
-            let randomTamanho = sheetViewModel.intervaloTamanhoProcesso.range.randomElement()!
-            
-            controladora.addProcess(process: .init(duracaoProcesso: randomDuracao, tamanhoProcesso: randomTamanho, tempoCriacao: randomTempoCriacao))
-        }
-    }
-    
-    
-    
-    
-    
-}
 
 struct ContentView: View {
     
@@ -122,11 +84,10 @@ struct ContentView: View {
 
                     ForEach(ram.queue.elements) { ram in
                         switch ram.tipo{
-                            case .buraco:
-                                Text("")
+                   
                             case .processo(processo: let p):
                                 Text("\(p.description)")
-                            case .so:
+                            default:
                                 Text("")
                         }
                     
@@ -191,22 +152,6 @@ struct ContentView: View {
             
             Button {
                 showingSheet = true
-
-//                c.addProcess(process: .init(duracaoProcesso: 10, tamanhoProcesso: 20, tempoCriacao: 5))
-//
-//                c.addProcess(process: .init(duracaoProcesso: 100, tamanhoProcesso: 40, tempoCriacao: 10))
-//
-//                c.addProcess(process: .init(duracaoProcesso: 10, tamanhoProcesso: 5, tempoCriacao: 10))
-//
-//                c.addProcess(process: .init(duracaoProcesso: 10, tamanhoProcesso: 2, tempoCriacao: 15))
-//                c.addProcess(process: .init(duracaoProcesso: 10, tamanhoProcesso: 20, tempoCriacao: 5))
-//
-//                c.addProcess(process: .init(duracaoProcesso: 10, tamanhoProcesso: 20, tempoCriacao: 20))
-//
-//                c.addProcess(process: .init(duracaoProcesso: 10, tamanhoProcesso: 5, tempoCriacao: 25))
-//
-//                c.addProcess(process: .init(duracaoProcesso: 10, tamanhoProcesso: 2, tempoCriacao: 30))
-//
                 
             } label: {
                 Text("Iniciar simulação")
