@@ -22,9 +22,12 @@ enum EstrategiaAlocacao:String, CaseIterable{
 
 
 class ViewModel: ObservableObject{
-    @Published var rams: Array<MemoriaRAMModel> = []
-
+    @Published var processosExecucao: Array<MemoriaRAMModel> = []
+    
 }
+
+
+
 
 class MemoriaRAM: ObservableObject{
     
@@ -32,23 +35,33 @@ class MemoriaRAM: ObservableObject{
     var timer = Timer.publish(every: 1, on: .current, in: .default).autoconnect()
     
     @Published var queue: Queue<MemoriaRAMModel> = .init()
-    
     @ObservedObject var viewModel: ViewModel = .init()
+    
+
+    var estrategiaAlocacao: EstrategiaAlocacao = .firstFit
+    var memoriaDisponivel: Int = 0
+    var memoriaTotal: Int = 0
+    @Published var memoriaAlocada = 0
     
     var notificationRodando: Notify
     var notificationFinalizou: Notify
     
-    var estrategiaAlocacao: EstrategiaAlocacao = .firstFit
     
-    var memoria: Int = 0
-    var memoriaTotal: Int = 0
-    @Published var memoriaAlocada = 0
+    init( nr: Notify, nf: Notify){
+        
+        self.notificationRodando = nr
+        self.notificationFinalizou = nf
+        
+        listenToNotications()
+     
+    }
+    
     
     
     
     func sumProcessTotal() -> Int{
     
-        return self.viewModel.rams.map { value in
+        return self.viewModel.processosExecucao.map { value in
             switch value.tipo{
                 
             case .so:
@@ -61,34 +74,33 @@ class MemoriaRAM: ObservableObject{
         }.filter{$0 > 0}.reduce(0) {$0 + $1}
     }
     
+    func getBuracosSizes() -> Array<(Int,Int)>{
+        
+        return self.viewModel.processosExecucao.enumerated().map { (index,ram) in
+            switch ram.tipo{
+                
+                case .buraco:
+                    return (index, ram.tamanho!)
+                default:
+                    return (index, -1)
+            }
+            
+        }.filter{$0.1 > 0}
+    }
+    
+    
     func findRole(alg: EstrategiaAlocacao, tamanho: Int) -> Int?{
           
-          var distance = self.viewModel.rams.enumerated()
-
-              .map { (index,ram) in
-              switch ram.tipo{
-                      
-                  case .so:
-                      return (index,-1)
-                  case .processo(processo: _):
-                      return (index,-1)
-                  case .buraco:
-                    return  (index,ram.tamanho!)
-              }
-              }.filter {$0.1 > -1}
-          
+        var distance = self.getBuracosSizes()
           
         let max = distance.sorted(by: {$0.1 > $1.1}).filter{$0.1 >= tamanho}.first
         let min = distance.sorted(by: {$0.1 < $1.1}).filter{$0.1 >= tamanho}.first
-          
-          
-        
-          
-          switch alg{
+  
+        switch alg{
               case .bestFit:
                   return min?.0
               case .firstFit:
-              return try? self.viewModel.rams.lastIndex(where: {$0.tipo == .buraco})
+              return try? self.viewModel.processosExecucao.lastIndex(where: {$0.tipo == .buraco})
               case .worstFit:
                   return max?.0
           }
@@ -96,7 +108,7 @@ class MemoriaRAM: ObservableObject{
     
     
     func index(processo: Process) -> Int?{
-        return try? self.viewModel.rams.firstIndex(where: { ram in
+        return try? self.viewModel.processosExecucao.firstIndex(where: { ram in
             
             switch ram.tipo{
             case .so:
@@ -113,17 +125,16 @@ class MemoriaRAM: ObservableObject{
     
     func removeProcess(processo: Process){
             if let index = self.index(processo: processo){
-                self.viewModel.rams[index].tipo = .buraco
+                self.viewModel.processosExecucao[index].tipo = .buraco
 
             }
             self.mergeBuracos()
             self.memoriaAlocada = sumProcessTotal()
-        
 
     }
     
-    
-    func splitByMissingInteger(array: [(Int,Int)]) -> [[(Int,Int)]]? {
+    // Agrupar buracos próximos
+    func groupNearBuracos(array: [(Int,Int)]) -> [[(Int,Int)]]? {
         var arrayFinal :[[(Int,Int)]] = [ [(Int,Int)]() ]
         var i = 0
         for num in array{
@@ -141,47 +152,20 @@ class MemoriaRAM: ObservableObject{
     }
     
     
+
+    
+    
     func mergeBuracos(){
         
-        let listOfIndexes = self.viewModel.rams.enumerated().map { (index,ram) in
-            switch ram.tipo{
-                
-            case .so:
-                return (index, -1)
-            case .processo(processo: _):
-                return (index, -1)
-            case .buraco:
-                return (index, ram.tamanho!)
-            }
-            
-        }.filter{$0.1 > 0}
+        let listOfIndexes = getBuracosSizes()
         
-        if let listSplit = splitByMissingInteger(array: listOfIndexes){
-            
-            print("SO ->", self.memoriaTotal - self.memoria)
-            let p_espera = self.queue.elements.enumerated().map{ (index,ram) in
-                return (index,ram.tamanho!)
-            }
-            let p =  self.viewModel.rams .enumerated().filter{
-                $0.1.tipo != .buraco && $0.1.tipo != .so
-            }
-               .map{ (index,ram) in
-                return (index,ram.tamanho!)
-            }
-            print("Espera ->",p_espera)
-            print("Processos ->",p)
-            print("Buracos->", listSplit)
-            
-            print((self.memoriaTotal - self.memoria) +
-                            p.reduce(0) {$0 + $1.1} +
-                            listSplit.reduce(0) {$0 + $1.reduce(0){$0 + $1.1}}
-                            )
-            
-            
-            
+        if let listSplit = groupNearBuracos(array: listOfIndexes){
+        
+
                 listSplit.filter{$0.count >= 2}.forEach { array in
                
                         let sum = array.map{$0.1}.reduce(0, +)
+                    
                         let falta = memoriaAlocada - sum
                         
                         let indexFirst = (array.first?.0)!
@@ -190,27 +174,18 @@ class MemoriaRAM: ObservableObject{
                         var buraco = MemoriaRAMModel(tipo: .buraco, tamanho:  sum)
                     
                     
-                        self.viewModel.rams[indexFirst] = buraco
+                        self.viewModel.processosExecucao[indexFirst] = buraco
                         
 
                         if(indexLast > indexFirst+1){
-                            self.viewModel.rams.removeSubrange(indexFirst+1...indexLast)
+                            self.viewModel.processosExecucao.removeSubrange(indexFirst+1...indexLast)
                         }else if(indexLast == indexFirst+1){
-                            self.viewModel.rams.remove(at: indexFirst+1)
+                            self.viewModel.processosExecucao.remove(at: indexFirst+1)
                         }
-                    
-                          
-                            
-                        
-                        
                     
 
                 }
-//
-//            if let index = self.viewModel.rams.lastIndex(where: {$0.tipo == .buraco }){
-//                self.viewModel.rams[index].tamanho = memoria - memoriaAlocada
-//            }
-                
+
             }
         
       
@@ -233,9 +208,9 @@ class MemoriaRAM: ObservableObject{
         }).first ?? 0)
     }
     
-    func enqueue(){
+    func nextProcessToExecute(){
   
-        if(sumProcessTotal() + sizeOfNextOnQueue() <= self.memoria){
+        if(sumProcessTotal() + sizeOfNextOnQueue() <= self.memoriaDisponivel){
                         //executa o algoritmo
                         if let fila = self.queue.dequeue(){
                             
@@ -254,34 +229,10 @@ class MemoriaRAM: ObservableObject{
                         }
                 }
         
-       // self.viewModel.objectWillChange.send()
 
     }
     
-    func nextWillFinish() -> Int{
-      
-        var array: Array<MemoriaRAMModel> = self.viewModel.rams
-        
-       if let arrayListed = array.map{ value in
-            switch value.tipo{
-            case .processo(processo: let p):
-                if let tempoAtual = p.tempoAtual{
-                    return (p.tamanhoProcesso, p.tempoFinal! - tempoAtual)
-                }else{
-                    return (p.tamanhoProcesso, 0)
-                }
-               
-            default:
-                return (0,0)
-            }
-        }.filter{$0.1 > 0.0}.sorted(by: {$0.0 < $1.0}).first{
-            return arrayListed.0
-        }else{
-            return 0
 
-        }
-       
-    }
     
     func addProcess(ram: MemoriaRAMModel){
         
@@ -298,7 +249,7 @@ class MemoriaRAM: ObservableObject{
                         //Se basea no tamanaho e particiona
                         //Particiona
                     
-                        var aux = self.viewModel.rams[index]
+                        var aux = self.viewModel.processosExecucao[index]
                         aux.tamanho = (aux.tamanho!) - processo.tamanhoProcesso
                       
                     
@@ -306,16 +257,16 @@ class MemoriaRAM: ObservableObject{
                     print(aux.tamanho!)
                     if(aux.tamanho! > 0){
                             
-                            if(index+1 > self.viewModel.rams.count){
-                                self.viewModel.rams[index] = ram
-                                self.viewModel.rams[index+1] = aux
+                            if(index+1 > self.viewModel.processosExecucao.count){
+                                self.viewModel.processosExecucao[index] = ram
+                                self.viewModel.processosExecucao[index+1] = aux
                             }else{
-                                self.viewModel.rams[index] = ram
-                                self.viewModel.rams.append(aux)
+                                self.viewModel.processosExecucao[index] = ram
+                                self.viewModel.processosExecucao.append(aux)
                             }
                             
                         } else if(aux.tamanho! < 0) {
-                                self.viewModel.rams[index] = ram
+                                self.viewModel.processosExecucao[index] = ram
 
                         }
 
@@ -354,48 +305,40 @@ class MemoriaRAM: ObservableObject{
                 }else if let process = notification.object as? Process{
                     
                     
-                    var processM = process
+                    var processModified = process
                     
-                    if processM.addTime(tempo: timer){
+                    if processModified.addTime(tempo: timer){
                         self.removeProcess(processo: process)
-                        processM.isFinished = true
-                        NotificationCenter.default.post(name: self.notificationFinalizou.name, object: processM)
+                        processModified.isFinished = true
+                        NotificationCenter.default.post(name: self.notificationFinalizou.name, object: processModified)
                     }else{
-                        NotificationCenter.default.post(name: self.notificationRodando.name, object: processM)
+                        NotificationCenter.default.post(name: self.notificationRodando.name, object: processModified)
                     }
-                    //enqueue()
-                    
+
                     
                 }
-                enqueue()
+                nextProcessToExecute()
                 
                 self.mergeBuracos()
-                if let index = self.viewModel.rams.lastIndex(where: {$0.tipo == .buraco}){
-                    let buracoSoma = self.viewModel.rams.filter{$0.tipo == .buraco}.reduce(0) {$0 + $1.tamanho!}
+                
+                //Evitar dos processos extrapolarem o tamanho da memoria
+                if let index = self.viewModel.processosExecucao.lastIndex(where: {$0.tipo == .buraco}){
+                    let buracoSoma = self.viewModel.processosExecucao.filter{$0.tipo == .buraco}.reduce(0) {$0 + $1.tamanho!}
                     
-                    let buracoTamanhoAtual = self.viewModel.rams[index].tamanho!
+                    let buracoTamanhoAtual = self.viewModel.processosExecucao[index].tamanho!
                     
                     
-                    let dif = memoria - sumProcessTotal()
+                    let dif = memoriaDisponivel - sumProcessTotal()
                     if(dif != 0){
-                        self.viewModel.rams[index].tamanho =  dif - (buracoSoma - buracoTamanhoAtual)
+                        self.viewModel.processosExecucao[index].tamanho =  dif - (buracoSoma - buracoTamanhoAtual)
                     }else{
-                        self.viewModel.rams.remove(at: index)
+                        self.viewModel.processosExecucao.remove(at: index)
                     }
                 }
 
             }.store(in: &cancellables)
     }
     
-    init( nr: Notify, nf: Notify){
-        
-        self.notificationRodando = nr
-        self.notificationFinalizou = nf
-        
-        listenToNotications()
-       
-
-     
-    }
+   
     
 }

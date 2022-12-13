@@ -9,13 +9,51 @@ import SwiftUI
 import Combine
 
 
+class Generator{
+    
+    
+    static func initialState(sheetViewModel: SheetViewModel, ram: MemoriaRAM){
+        ram.estrategiaAlocacao = sheetViewModel.alocacao
+        
+        ram.memoriaTotal = sheetViewModel.tamanhoMemoria
+        
+        ram.memoriaDisponivel = sheetViewModel.tamanhoMemoria - sheetViewModel.tamanhoMemoriaSistemaOperacional
+        
+        let so = MemoriaRAMModel(tipo: .so, tamanho: sheetViewModel.tamanhoMemoriaSistemaOperacional)
+        
+        let buraco = MemoriaRAMModel(tipo: .buraco, tamanho:  ram.memoriaTotal - sheetViewModel.tamanhoMemoriaSistemaOperacional)
+        
+        ram.viewModel.processosExecucao.append(so)
+        ram.viewModel.processosExecucao.append(buraco)
 
+
+        DispatchQueue.main.async {
+            ram.objectWillChange.send()
+        }
+    }
+    
+    static func processes(sheetViewModel: SheetViewModel, controladora: Controladora){
+        
+        for _ in Range(0...sheetViewModel.qntdProcessos-1){
+            let randomTempoCriacao = sheetViewModel.intervaloTempoCriacao.range.randomElement()!
+            let randomDuracao = sheetViewModel.intervaloDuracao.range.randomElement()!
+            let randomTamanho = sheetViewModel.intervaloTamanhoProcesso.range.randomElement()!
+            
+            controladora.addProcess(process: .init(duracaoProcesso: randomDuracao, tamanhoProcesso: randomTamanho, tempoCriacao: randomTempoCriacao))
+        }
+    }
+    
+    
+    
+    
+    
+}
 
 struct ContentView: View {
     
         
     @ObservedObject var ram: MemoriaRAM
-    @ObservedObject var c: Controladora
+    @ObservedObject var controladora: Controladora
     
     @ObservedObject private var sheetViewModel: SheetViewModel = .init()
     @State private var showingSheet = false
@@ -23,7 +61,6 @@ struct ContentView: View {
     
     @State private var progress: Double = 0.0
     @State private var arrayOfRam = Array<MemoriaRAMModel>()
-    
     
     var nf: Notify = .init(name: "finalizou")
     var nr: Notify = .init(name: "rodando")
@@ -38,51 +75,16 @@ struct ContentView: View {
         ne.register()
         
         ram = .init(nr: nr, nf: nf)
-        c = .init(nf: nf, ne: ne)
+        controladora = .init(nf: nf, ne: ne)
     }
     
 
     func calculateTempoMedio() -> Double{
-        let soma = c.processesFinalizados.filter{ $0.isFinished}.reduce(0.0) { $0 + ($1.tempoAtual! - $1.tempoCriacao!)}
-        return soma/Double(c.processesFinalizados.count)
+        let soma = controladora.processesFinalizados.filter{ $0.isFinished}.reduce(0.0) { $0 + ($1.tempoAtual! - $1.tempoCriacao!)}
+        return soma/Double(controladora.processesFinalizados.count)
     }
     
-    func generateProcesses(){
-        
-        for _ in Range(0...self.sheetViewModel.qntdProcessos-1){
-            let randomTempoCriacao = self.sheetViewModel.intervaloTempoCriacao.range.randomElement()!
-            let randomDuracao = self.sheetViewModel.intervaloDuracao.range.randomElement()!
-            let randomTamanho = self.sheetViewModel.intervaloTamanhoProcesso.range.randomElement()!
-            
-            c.addProcess(process: .init(duracaoProcesso: randomDuracao, tamanhoProcesso: randomTamanho, tempoCriacao: randomTempoCriacao))
-        }
-    }
-    
-    func generateInitialState(){
-        
-        self.ram.estrategiaAlocacao = self.sheetViewModel.alocacao
-        
-        self.ram.memoriaTotal = self.sheetViewModel.tamanhoMemoria
-        
-        self.ram.memoria = self.sheetViewModel.tamanhoMemoria - self.sheetViewModel.tamanhoMemoriaSistemaOperacional
-        
-        let so = MemoriaRAMModel(tipo: .so, tamanho: self.sheetViewModel.tamanhoMemoriaSistemaOperacional)
-        
-        let buraco = MemoriaRAMModel(tipo: .buraco, tamanho:  self.ram.memoriaTotal - self.sheetViewModel.tamanhoMemoriaSistemaOperacional)
-        
-        self.ram.viewModel.rams.append(so)
-        self.ram.viewModel.rams.append(buraco)
 
-        
-        print(self.sheetViewModel.tamanhoMemoria)
-        
-
-        DispatchQueue.main.async {
-            self.ram.objectWillChange.send()
-        }
-        
-    }
-    
     
 
     var body: some View {
@@ -104,7 +106,7 @@ struct ContentView: View {
             
             Section{
                 List{
-                    ForEach(c.processesEntrou.filter{$0.tempoCriacao == nil}.sorted { $0.tempoCriacaoSeconds < $1.tempoCriacaoSeconds}, id: \.id) { p in
+                    ForEach(controladora.processesEntrou.filter{$0.tempoCriacao == nil}.sorted { $0.tempoCriacaoSeconds < $1.tempoCriacaoSeconds}, id: \.id) { p in
                         
                         Text("Processo \(p.idString) -> Daqui \(p.tempoCriacaoSeconds)s")
                     }
@@ -137,11 +139,11 @@ struct ContentView: View {
             
             Section{
                 HStack{
-                    ForEach(self.ram.viewModel.rams, id: \.id) { ram in
+                    ForEach(self.ram.viewModel.processosExecucao, id: \.id) { ram in
                         Card(ram: ram)
                     }
-                    .onReceive(self.ram.viewModel.rams.publisher) { _ in
-                        self.ram.viewModel.rams = self.ram.viewModel.rams.reduce(into: Array<MemoriaRAMModel>()) { restante, elemento in
+                    .onReceive(self.ram.viewModel.processosExecucao.publisher) { _ in
+                        self.ram.viewModel.processosExecucao = self.ram.viewModel.processosExecucao.reduce(into: Array<MemoriaRAMModel>()) { restante, elemento in
                             
                             if let last = restante.last{
                                 
@@ -169,7 +171,7 @@ struct ContentView: View {
             Section {
                 List{
 
-                    ForEach(c.processesFinalizados, id: \.id) { process in
+                    ForEach(controladora.processesFinalizados, id: \.id) { process in
 
                         Text("\(process.description)")
 
@@ -208,15 +210,15 @@ struct ContentView: View {
                 
             } label: {
                 Text("Iniciar simulação")
-            }.disabled(c.processesEntrou.count != c.processesFinalizados.count)
+            }.disabled(controladora.processesEntrou.count != controladora.processesFinalizados.count)
         }
        
        
-        .onReceive(c.processesFinalizados.publisher, perform: { _ in
-            showingAlert = c.processesEntrou.count == c.processesFinalizados.count &&
-                c.processesEntrou.count > 0
+        .onReceive(controladora.processesFinalizados.publisher, perform: { _ in
+            showingAlert = controladora.processesEntrou.count == controladora.processesFinalizados.count &&
+                controladora.processesEntrou.count > 0
             
-            self.progress =  100.0 * Double(self.c.processesFinalizados.count) / Double(self.c.processesEntrou.count)
+            self.progress =  100.0 * Double(self.controladora.processesFinalizados.count) / Double(self.controladora.processesEntrou.count)
             DispatchQueue.main.async {
                 self.ram.objectWillChange.send()
             }
@@ -229,25 +231,23 @@ struct ContentView: View {
         }.sheet(isPresented: $showingSheet, onDismiss: {
             
            
-            
+
             DispatchQueue.main.async{
                 self.ram.listenToNotications()
-                self.c.listenToNotications()
+                self.controladora.listenToNotications()
                 
-                self.ram.viewModel.rams = []
+                self.ram.viewModel.processosExecucao = []
                 self.ram.memoriaAlocada = 0
-                self.c.processesEntrou = []
-                self.c.processesFinalizados = []
+                self.controladora.processesEntrou = []
+                self.controladora.processesFinalizados = []
                 self.progress = 0.0
-                self.generateInitialState()
-                self.generateProcesses()
+                
+                Generator.initialState(sheetViewModel: self.sheetViewModel, ram: self.ram)
+                Generator.processes(sheetViewModel: self.sheetViewModel, controladora: self.controladora)
+
             }
            
-            
-          
-            
-
-            
+     
         }) {
             Sheet(viewModel: sheetViewModel)
         }

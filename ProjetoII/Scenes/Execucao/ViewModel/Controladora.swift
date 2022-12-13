@@ -62,7 +62,6 @@ class Controladora: ObservableObject{
                 
                 if(process.isFinished){
                     // foi finalizado
-                    
                     processesFinalizados.append(process)
                     
                 }else{
@@ -70,13 +69,8 @@ class Controladora: ObservableObject{
                     let ram = MemoriaRAMModel(tipo: .processo(processo: process), tamanho: process.tamanhoProcesso)
                     NotificationCenter.default.post(name:Notification.Name("rodando"), object: ram)
                     
-                    //self.queue.enqueue(process)
-
                 }
 
-             
-              
-               
 
             }
         }.store(in: &cancellables)

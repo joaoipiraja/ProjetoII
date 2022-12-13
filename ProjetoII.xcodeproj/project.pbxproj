@@ -8,7 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		4E1BAFE2292D029700B1ACB5 /* Queue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E1BAFE1292D029700B1ACB5 /* Queue.swift */; };
-		4E1BAFE4292D02B000B1ACB5 /* Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E1BAFE3292D02B000B1ACB5 /* Utils.swift */; };
+		4E1BAFE4292D02B000B1ACB5 /* Extensios.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E1BAFE3292D02B000B1ACB5 /* Extensios.swift */; };
 		4E1BAFE6292D02D100B1ACB5 /* ProcessModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E1BAFE5292D02D100B1ACB5 /* ProcessModel.swift */; };
 		4E1BAFE8292D02EA00B1ACB5 /* Notify.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E1BAFE7292D02EA00B1ACB5 /* Notify.swift */; };
 		4E1BAFEA292D031500B1ACB5 /* MemoriaRAMModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E1BAFE9292D031500B1ACB5 /* MemoriaRAMModel.swift */; };
@@ -44,7 +44,7 @@
 
 /* Begin PBXFileReference section */
 		4E1BAFE1292D029700B1ACB5 /* Queue.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Queue.swift; sourceTree = "<group>"; };
-		4E1BAFE3292D02B000B1ACB5 /* Utils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Utils.swift; sourceTree = "<group>"; };
+		4E1BAFE3292D02B000B1ACB5 /* Extensios.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Extensios.swift; sourceTree = "<group>"; };
 		4E1BAFE5292D02D100B1ACB5 /* ProcessModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProcessModel.swift; sourceTree = "<group>"; };
 		4E1BAFE7292D02EA00B1ACB5 /* Notify.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Notify.swift; sourceTree = "<group>"; };
 		4E1BAFE9292D031500B1ACB5 /* MemoriaRAMModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MemoriaRAMModel.swift; sourceTree = "<group>"; };
@@ -112,19 +112,11 @@
 		4E3A02A2292555790075D0E1 /* ProjetoII */ = {
 			isa = PBXGroup;
 			children = (
+				4E4EBB502948DC410015DE4C /* Scenes */,
+				4E4EBB4F2948DC1D0015DE4C /* Utils */,
 				4E3A02A3292555790075D0E1 /* ProjetoIIApp.swift */,
-				4E8097A5293256E400B6F5CB /* Card.swift */,
-				4E3A02A5292555790075D0E1 /* ContentView.swift */,
-				4E1BAFE1292D029700B1ACB5 /* Queue.swift */,
-				4E1BAFE3292D02B000B1ACB5 /* Utils.swift */,
-				4E1BAFE5292D02D100B1ACB5 /* ProcessModel.swift */,
-				4E1BAFE7292D02EA00B1ACB5 /* Notify.swift */,
-				4E1BAFED292D035200B1ACB5 /* Controladora.swift */,
-				4E1BAFE9292D031500B1ACB5 /* MemoriaRAMModel.swift */,
-				4E1BAFEB292D033200B1ACB5 /* MemoriaRAM.swift */,
 				4E3A02A72925557A0075D0E1 /* Assets.xcassets */,
 				4E3A02A92925557A0075D0E1 /* Preview Content */,
-				4E4EBB42293AEE240015DE4C /* Sheet.swift */,
 			);
 			path = ProjetoII;
 			sourceTree = "<group>";
@@ -152,6 +144,62 @@
 				4E3A02C02925557A0075D0E1 /* ProjetoIIUITestsLaunchTests.swift */,
 			);
 			path = ProjetoIIUITests;
+			sourceTree = "<group>";
+		};
+		4E4EBB4F2948DC1D0015DE4C /* Utils */ = {
+			isa = PBXGroup;
+			children = (
+				4E1BAFE7292D02EA00B1ACB5 /* Notify.swift */,
+				4E1BAFE3292D02B000B1ACB5 /* Extensios.swift */,
+				4E1BAFE1292D029700B1ACB5 /* Queue.swift */,
+			);
+			path = Utils;
+			sourceTree = "<group>";
+		};
+		4E4EBB502948DC410015DE4C /* Scenes */ = {
+			isa = PBXGroup;
+			children = (
+				4E4EBB512948DC4A0015DE4C /* Execucao */,
+			);
+			path = Scenes;
+			sourceTree = "<group>";
+		};
+		4E4EBB512948DC4A0015DE4C /* Execucao */ = {
+			isa = PBXGroup;
+			children = (
+				4E4EBB542948DD3F0015DE4C /* Model */,
+				4E4EBB532948DD300015DE4C /* View */,
+				4E4EBB522948DD180015DE4C /* ViewModel */,
+				4E3A02A5292555790075D0E1 /* ContentView.swift */,
+			);
+			path = Execucao;
+			sourceTree = "<group>";
+		};
+		4E4EBB522948DD180015DE4C /* ViewModel */ = {
+			isa = PBXGroup;
+			children = (
+				4E1BAFEB292D033200B1ACB5 /* MemoriaRAM.swift */,
+				4E1BAFED292D035200B1ACB5 /* Controladora.swift */,
+			);
+			path = ViewModel;
+			sourceTree = "<group>";
+		};
+		4E4EBB532948DD300015DE4C /* View */ = {
+			isa = PBXGroup;
+			children = (
+				4E4EBB42293AEE240015DE4C /* Sheet.swift */,
+				4E8097A5293256E400B6F5CB /* Card.swift */,
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
+		4E4EBB542948DD3F0015DE4C /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				4E1BAFE5292D02D100B1ACB5 /* ProcessModel.swift */,
+				4E1BAFE9292D031500B1ACB5 /* MemoriaRAMModel.swift */,
+			);
+			path = Model;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -294,7 +342,7 @@
 				4E1BAFEC292D033200B1ACB5 /* MemoriaRAM.swift in Sources */,
 				4E8097A6293256E400B6F5CB /* Card.swift in Sources */,
 				4E3A02A4292555790075D0E1 /* ProjetoIIApp.swift in Sources */,
-				4E1BAFE4292D02B000B1ACB5 /* Utils.swift in Sources */,
+				4E1BAFE4292D02B000B1ACB5 /* Extensios.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
